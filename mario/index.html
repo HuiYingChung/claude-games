@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mario World 1-1</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <section class="game-shell">
+      <header class="topbar">
+        <div class="title-block">
+          <p class="eyebrow">Nintendo Style Platformer</p>
+          <h1>Mario World 1-1</h1>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <span class="label">Score</span>
+            <strong id="score">000000</strong>
+          </div>
+          <div class="stat">
+            <span class="label">Coins</span>
+            <strong id="coins">x00</strong>
+          </div>
+          <div class="stat">
+            <span class="label">Lives</span>
+            <strong id="lives">3</strong>
+          </div>
+          <div class="stat">
+            <span class="label">Time</span>
+            <strong id="timer">400</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="viewport-wrap">
+        <canvas id="game" width="960" height="540" aria-label="Mario style platform game"></canvas>
+        <div class="overlay">
+          <div class="badge">World 1-1</div>
+          <p id="message">按 Enter 開始，方向鍵移動，空白鍵跳躍。</p>
+        </div>
+      </section>
+
+      <section class="controls-panel">
+        <div class="buttons">
+          <button id="startBtn" type="button">Start</button>
+          <button id="restartBtn" type="button">Restart</button>
+        </div>
+        <p class="hint">桌機：方向鍵 / A D 移動，空白鍵或 W 跳躍。手機：使用下方按鈕。</p>
+      </section>
+
+      <section class="touch-controls" aria-label="Touch controls">
+        <button class="control" data-control="left" type="button">Left</button>
+        <button class="control" data-control="jump" type="button">Jump</button>
+        <button class="control" data-control="right" type="button">Right</button>
+      </section>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

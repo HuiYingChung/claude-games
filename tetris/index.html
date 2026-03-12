@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>霓虹俄羅斯方塊</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="layout">
+    <section class="game-panel">
+      <div class="hero">
+        <p class="eyebrow">Arcade Puzzle</p>
+        <h1>霓虹俄羅斯方塊</h1>
+        <p class="subtitle">排滿整行消除方塊，速度會隨等級逐步加快。</p>
+      </div>
+
+      <div class="game-shell">
+        <section class="board-wrap">
+          <canvas id="board" width="300" height="600" aria-label="俄羅斯方塊遊戲主畫面"></canvas>
+          <div class="board-overlay" id="overlay">
+            <h2 id="overlayTitle">準備開始</h2>
+            <p id="overlayMessage">按 Enter 或開始按鈕開始遊戲。</p>
+          </div>
+        </section>
+
+        <aside class="sidebar">
+          <div class="card stats">
+            <div class="stat">
+              <span>分數</span>
+              <strong id="score">0</strong>
+            </div>
+            <div class="stat">
+              <span>消除行數</span>
+              <strong id="lines">0</strong>
+            </div>
+            <div class="stat">
+              <span>等級</span>
+              <strong id="level">1</strong>
+            </div>
+          </div>
+
+          <div class="card">
+            <p class="card-label">下一塊</p>
+            <canvas id="next" width="120" height="120" aria-label="下一個方塊預覽"></canvas>
+          </div>
+
+          <div class="card actions">
+            <button id="startBtn" type="button">開始</button>
+            <button id="pauseBtn" type="button">暫停</button>
+            <button id="restartBtn" type="button">重新開始</button>
+          </div>
+
+          <div class="card instructions">
+            <p class="card-label">操作</p>
+            <ul>
+              <li>左右方向鍵：移動</li>
+              <li>上方向鍵 / X：旋轉</li>
+              <li>下方向鍵：加速下降</li>
+              <li>空白鍵：瞬間落下</li>
+              <li>P：暫停</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+
+      <section class="touch-controls" aria-label="觸控操作">
+        <button data-action="left" type="button">左移</button>
+        <button data-action="rotate" type="button">旋轉</button>
+        <button data-action="right" type="button">右移</button>
+        <button data-action="down" type="button">下降</button>
+        <button data-action="drop" type="button">直落</button>
+      </section>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
