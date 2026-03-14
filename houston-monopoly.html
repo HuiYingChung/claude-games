@@ -1107,11 +1107,11 @@ function renderPlayerSetup() {
   list.innerHTML = '';
   for (let i = 0; i < count; i++) {
     list.innerHTML += `
-      <div class="flex items-center gap-2 bg-gray-800/50 rounded-lg p-2">
-        <span class="text-xl">${TOKENS[i]}</span>
+      <div class="flex flex-col sm:flex-row sm:items-center gap-2 bg-gray-800/50 rounded-lg p-2 overflow-hidden">
+        <span class="text-xl shrink-0 self-center sm:self-auto">${TOKENS[i]}</span>
         <input type="text" id="pname-${i}" value="${HOUSTON_PLAYER_NAMES[i] || `Player ${i+1}`}"
-          class="flex-1 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white" />
-        <select id="ptype-${i}" class="bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white">
+          class="w-full min-w-0 sm:flex-1 bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white" />
+        <select id="ptype-${i}" class="w-full sm:w-auto sm:min-w-[96px] bg-gray-700 border border-gray-600 rounded px-2 py-1 text-sm text-white">
           <option value="human">${t('human')}</option>
           <option value="ai">${t('ai')}</option>
         </select>
