@@ -240,7 +240,7 @@ hr.ui-divider {
   display: none;
   position: fixed;
   bottom: 0; left: 0; right: 0;
-  height: 160px;
+  height: 190px;
   z-index: 30;
   pointer-events: none;
   padding: 10px 16px;
@@ -249,22 +249,22 @@ hr.ui-divider {
 #mobileControls > * { pointer-events: auto; }
 .dpad {
   position: absolute;
-  left: 20px;
-  bottom: 16px;
-  width: 140px;
-  height: 140px;
+  left: 16px;
+  bottom: 10px;
+  width: 176px;
+  height: 176px;
 }
 .dpad-btn {
   position: absolute;
-  width: 46px;
-  height: 46px;
+  width: 56px;
+  height: 56px;
   background: rgba(255,255,255,0.18);
   border: 2px solid rgba(255,255,255,0.35);
-  border-radius: 8px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
+  font-size: 22px;
   color: rgba(255,255,255,0.8);
   user-select: none;
   -webkit-user-select: none;
@@ -272,17 +272,16 @@ hr.ui-divider {
   transition: background 0.08s;
 }
 .dpad-btn.active { background: rgba(255,215,0,0.45); border-color: rgba(255,215,0,0.7); }
-.dpad-up { left: 47px; top: 0; }
-.dpad-down { left: 47px; bottom: 0; }
-.dpad-left { left: 0; top: 47px; }
-.dpad-right { right: 0; top: 47px; }
-.dpad-center { left: 47px; top: 47px; width: 46px; height: 46px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+.dpad-up { left: 60px; top: 0; }
+.dpad-down { left: 60px; bottom: 0; }
+.dpad-left { left: 0; top: 60px; }
+.dpad-right { right: 0; top: 60px; }
 .fire-btn {
   position: absolute;
-  right: 24px;
-  bottom: 36px;
-  width: 72px;
-  height: 72px;
+  right: 20px;
+  bottom: 45px;
+  width: 80px;
+  height: 80px;
   background: rgba(255,60,60,0.3);
   border: 3px solid rgba(255,80,80,0.6);
   border-radius: 50%;
@@ -301,8 +300,8 @@ hr.ui-divider {
 .fire-btn.active { background: rgba(255,60,60,0.6); border-color: rgba(255,100,100,0.9); box-shadow: 0 0 20px rgba(255,60,60,0.5); }
 .mobile-pause {
   position: absolute;
-  right: 110px;
-  bottom: 50px;
+  right: 116px;
+  bottom: 60px;
   width: 44px;
   height: 44px;
   background: rgba(255,255,255,0.15);
@@ -353,28 +352,26 @@ hr.ui-divider {
 @media (max-width: 480px) {
   #startScreen h1 { font-size: 16px; }
   .btn { padding: 8px 18px; font-size: 9px; }
-  .dpad { left: 10px; bottom: 10px; width: 120px; height: 120px; }
-  .dpad-btn { width: 38px; height: 38px; font-size: 14px; }
+  .dpad { left: 10px; bottom: 8px; width: 150px; height: 150px; }
+  .dpad-btn { width: 48px; height: 48px; font-size: 18px; }
+  .dpad-up { left: 51px; top: 0; }
+  .dpad-down { left: 51px; bottom: 0; }
+  .dpad-left { left: 0; top: 51px; }
+  .dpad-right { right: 0; top: 51px; }
+  .fire-btn { width: 68px; height: 68px; right: 14px; bottom: 36px; font-size: 9px; }
+  .mobile-pause { right: 96px; bottom: 48px; width: 38px; height: 38px; font-size: 14px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  #mobileHud { height: 28px; font-size: 7px; }
+  #mobileControls { height: 130px; }
+  .dpad { width: 120px; height: 120px; bottom: 5px; left: 10px; }
+  .dpad-btn { width: 38px; height: 38px; font-size: 15px; }
   .dpad-up { left: 41px; top: 0; }
   .dpad-down { left: 41px; bottom: 0; }
   .dpad-left { left: 0; top: 41px; }
   .dpad-right { right: 0; top: 41px; }
-  .dpad-center { left: 41px; top: 41px; width: 38px; height: 38px; }
-  .fire-btn { width: 60px; height: 60px; right: 16px; bottom: 28px; font-size: 8px; }
-  .mobile-pause { right: 90px; bottom: 40px; width: 36px; height: 36px; font-size: 14px; }
-}
-@media (max-height: 500px) and (orientation: landscape) {
-  #mobileHud { height: 28px; font-size: 7px; }
-  #mobileControls { height: 120px; }
-  .dpad { width: 110px; height: 110px; bottom: 5px; left: 10px; }
-  .dpad-btn { width: 34px; height: 34px; font-size: 13px; }
-  .dpad-up { left: 38px; top: 0; }
-  .dpad-down { left: 38px; bottom: 0; }
-  .dpad-left { left: 0; top: 38px; }
-  .dpad-right { right: 0; top: 38px; }
-  .dpad-center { left: 38px; top: 38px; width: 34px; height: 34px; }
-  .fire-btn { width: 56px; height: 56px; right: 16px; bottom: 20px; }
-  .mobile-pause { right: 86px; bottom: 26px; width: 34px; height: 34px; }
+  .fire-btn { width: 60px; height: 60px; right: 16px; bottom: 24px; }
+  .mobile-pause { right: 90px; bottom: 32px; width: 36px; height: 36px; }
 }
 </style>
 </head>
@@ -458,7 +455,6 @@ hr.ui-divider {
   <div class="dpad">
     <div class="dpad-btn dpad-up" data-dir="ArrowUp">▲</div>
     <div class="dpad-btn dpad-left" data-dir="ArrowLeft">◄</div>
-    <div class="dpad-center"></div>
     <div class="dpad-btn dpad-right" data-dir="ArrowRight">►</div>
     <div class="dpad-btn dpad-down" data-dir="ArrowDown">▼</div>
   </div>
@@ -1798,7 +1794,7 @@ function resizeGame() {
 
   // Reserved space for mobile UI elements
   const mobileHudH = isMobileView ? 36 : 0;
-  const mobileCtrlH = isMobileView ? 160 : 0;
+  const mobileCtrlH = isMobileView ? 190 : 0;
 
   // Calculate available space
   const baseW = COLS * TILE + (isMobileView ? 0 : UI_WIDTH) + 6;
