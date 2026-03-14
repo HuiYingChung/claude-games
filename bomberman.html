@@ -27,6 +27,8 @@ body {
   flex-direction: column;
   max-height: 100vh;
   padding: 4px 0;
+  touch-action: none;
+  -webkit-touch-callout: none;
 }
 h1 {
   font-size: clamp(1.2rem, 3vh, 2.2rem);
@@ -174,6 +176,155 @@ button:active { transform: translateY(0); }
   box-shadow: 0 6px 25px rgba(0,0,0,0.4);
 }
 .hidden { display: none; }
+
+/* ============= MOBILE TOUCH CONTROLS ============= */
+#mobileControls {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 190px;
+  z-index: 30;
+  pointer-events: none;
+  padding: 10px 16px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 80%, transparent 100%);
+}
+#mobileControls > * { pointer-events: auto; }
+
+.dpad {
+  position: absolute;
+  left: 16px;
+  bottom: 10px;
+  width: 206px;
+  height: 206px;
+}
+.dpad-btn {
+  position: absolute;
+  width: 66px;
+  height: 66px;
+  background: rgba(255,255,255,0.18);
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: rgba(255,255,255,0.8);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: background 0.08s;
+  padding: 0; margin: 0;
+  box-shadow: none;
+  letter-spacing: 0;
+}
+.dpad-btn.active { background: rgba(255,215,0,0.45); border-color: rgba(255,215,0,0.7); transform: none; }
+.dpad-up { left: 70px; top: 0; }
+.dpad-down { left: 70px; bottom: 0; }
+.dpad-left { left: 0; top: 70px; }
+.dpad-right { right: 0; top: 70px; }
+
+.fire-btn {
+  position: absolute;
+  right: 20px;
+  bottom: 45px;
+  width: 80px;
+  height: 80px;
+  background: rgba(255,107,53,0.3);
+  border: 3px solid rgba(255,107,53,0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: rgba(255,150,100,0.95);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: background 0.08s;
+  box-shadow: 0 0 12px rgba(255,107,53,0.3);
+  padding: 0; margin: 0;
+  letter-spacing: 0;
+}
+.fire-btn.active { background: rgba(255,107,53,0.6); border-color: rgba(255,107,53,0.9); box-shadow: 0 0 20px rgba(255,107,53,0.5); transform: none; }
+
+.mobile-pause {
+  position: absolute;
+  right: 130px;
+  bottom: 65px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: rgba(255,255,255,0.7);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  padding: 0; margin: 0;
+  box-shadow: none;
+  letter-spacing: 0;
+}
+
+/* Mobile HUD bar */
+#mobileHud {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 36px;
+  background: rgba(10,10,20,0.92);
+  border-bottom: 1px solid rgba(255,107,53,0.3);
+  z-index: 25;
+  padding: 0 8px;
+  align-items: center;
+  justify-content: space-around;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #aab;
+}
+#mobileHud .mh-item { display: flex; align-items: center; gap: 3px; }
+#mobileHud .mh-val { color: #ffd700; }
+
+/* ============= MEDIA QUERIES ============= */
+@media (max-width: 780px) {
+  h1 { display: none; }
+  #info-bar { display: none; }
+  #action-bar { display: none !important; }
+  #mobileControls { display: block; }
+  #mobileHud { display: flex; }
+  html, body { overflow: hidden; position: fixed; width: 100%; height: 100%; }
+  #start-screen, #game-over-screen {
+    max-width: 90vw;
+    padding: 18px 20px;
+  }
+  .controls-info { font-size: 0.8rem; line-height: 1.5; }
+  button { padding: 8px 24px; font-size: 0.85rem; }
+}
+@media (max-width: 480px) {
+  .dpad { left: 10px; bottom: 8px; width: 170px; height: 170px; }
+  .dpad-btn { width: 54px; height: 54px; font-size: 18px; }
+  .dpad-up { left: 58px; top: 0; }
+  .dpad-down { left: 58px; bottom: 0; }
+  .dpad-left { left: 0; top: 58px; }
+  .dpad-right { right: 0; top: 58px; }
+  .fire-btn { width: 68px; height: 68px; right: 14px; bottom: 36px; font-size: 24px; }
+  .mobile-pause { right: 110px; bottom: 48px; width: 38px; height: 38px; font-size: 14px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  #mobileHud { height: 28px; font-size: 0.6rem; }
+  #mobileControls { height: 130px; }
+  .dpad { width: 136px; height: 136px; bottom: 5px; left: 10px; }
+  .dpad-btn { width: 44px; height: 44px; font-size: 15px; }
+  .dpad-up { left: 46px; top: 0; }
+  .dpad-down { left: 46px; bottom: 0; }
+  .dpad-left { left: 0; top: 46px; }
+  .dpad-right { right: 0; top: 46px; }
+  .fire-btn { width: 60px; height: 60px; right: 16px; bottom: 24px; }
+  .mobile-pause { right: 96px; bottom: 32px; width: 36px; height: 36px; }
+}
 </style>
 </head>
 <body>
@@ -224,6 +375,28 @@ button:active { transform: translateY(0); }
   </div>
 </div>
 
+<!-- Mobile HUD bar -->
+<div id="mobileHud">
+  <div class="mh-item">🏷️ LV <span class="mh-val" id="mhLevel">1</span></div>
+  <div class="mh-item">❤️ <span class="mh-val" id="mhLives">3</span></div>
+  <div class="mh-item">⭐ <span class="mh-val" id="mhScore">0</span></div>
+  <div class="mh-item">💣 <span class="mh-val" id="mhBombs">1</span></div>
+  <div class="mh-item">🔥 <span class="mh-val" id="mhFire">1</span></div>
+  <div class="mh-item">🦶 <span class="mh-val" id="mhKick">0</span></div>
+</div>
+
+<!-- Mobile Touch Controls -->
+<div id="mobileControls">
+  <div class="dpad">
+    <div class="dpad-btn dpad-up" data-dir="ArrowUp">▲</div>
+    <div class="dpad-btn dpad-left" data-dir="ArrowLeft">◀</div>
+    <div class="dpad-btn dpad-right" data-dir="ArrowRight">▶</div>
+    <div class="dpad-btn dpad-down" data-dir="ArrowDown">▼</div>
+  </div>
+  <div class="fire-btn" id="fireBtn">💣</div>
+  <div class="mobile-pause" id="mobilePauseBtn">⏸</div>
+</div>
+
 <script>
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
@@ -234,25 +407,67 @@ canvas.width = COLS * TILE;
 canvas.height = ROWS * TILE;
 
 // ===================== RESPONSIVE SCALING =====================
-function resizeCanvas() {
+function resizeGame() {
   const container = document.getElementById('game-container');
-  const h1 = container.querySelector('h1');
-  const infoBar = document.getElementById('info-bar');
-  const actionBar = document.getElementById('action-bar');
-  const vh = window.innerHeight;
   const vw = window.innerWidth;
-  const otherH = (h1.offsetHeight || 30) + (infoBar.offsetHeight || 30) +
-                 (actionBar.offsetHeight || 40) + 24; // padding + gaps
-  const availH = vh - otherH;
-  const availW = vw - 16;
-  const scaleH = availH / canvas.height;
-  const scaleW = availW / canvas.width;
-  const scale = Math.min(scaleH, scaleW, 1);
-  canvas.style.width = (canvas.width * scale) + 'px';
-  canvas.style.height = (canvas.height * scale) + 'px';
+  const vh = window.innerHeight;
+  const isMobileView = vw < 780;
+
+  const mobileHudH = isMobileView ? 36 : 0;
+  const mobileCtrlH = isMobileView ? 190 : 0;
+
+  // Desktop: h1 + info-bar + action-bar + padding
+  const desktopChromeH = isMobileView ? 0 :
+    ((container.querySelector('h1')?.offsetHeight || 30) +
+     (document.getElementById('info-bar')?.offsetHeight || 30) +
+     (document.getElementById('action-bar')?.offsetHeight || 40) + 24);
+
+  const baseW = canvas.width + 6;
+  const baseH = canvas.height + desktopChromeH + 6;
+  const availW = vw;
+  const availH = vh - mobileHudH - mobileCtrlH;
+  const maxScale = isMobileView ? 1.5 : 1;
+  const scale = Math.min(availW / baseW, availH / baseH, maxScale);
+
+  if (isMobileView) {
+    // Mobile: transform-scale the container, center it between HUD and controls
+    const scaledW = baseW * scale;
+    const scaledH = canvas.height * scale;
+    const left = (vw - scaledW) / 2;
+    const top = mobileHudH + Math.max(0, (availH - scaledH) * 0.3);
+    container.style.position = 'fixed';
+    container.style.left = '0';
+    container.style.top = '0';
+    container.style.transform = `translate(${left}px, ${top}px) scale(${scale})`;
+    container.style.transformOrigin = 'top left';
+    canvas.style.width = '';
+    canvas.style.height = '';
+    updateMobileHud();
+  } else {
+    // Desktop: just scale the canvas, keep normal flow
+    container.style.position = '';
+    container.style.left = '';
+    container.style.top = '';
+    container.style.transform = '';
+    container.style.transformOrigin = '';
+    canvas.style.width = (canvas.width * scale) + 'px';
+    canvas.style.height = (canvas.height * scale) + 'px';
+  }
 }
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
+
+function updateMobileHud() {
+  const el = id => document.getElementById(id);
+  if (el('mhLevel')) el('mhLevel').textContent = typeof level !== 'undefined' ? level : 1;
+  if (el('mhLives')) el('mhLives').textContent = typeof lives !== 'undefined' ? lives : 3;
+  if (el('mhScore')) el('mhScore').textContent = typeof score !== 'undefined' ? score : 0;
+  if (el('mhBombs')) el('mhBombs').textContent = typeof bombMax !== 'undefined' ? bombMax : 1;
+  if (el('mhFire')) el('mhFire').textContent = typeof firePower !== 'undefined' ? firePower : 1;
+  if (el('mhKick')) el('mhKick').textContent = typeof kickPower !== 'undefined' ? kickPower : 0;
+}
+
+window.addEventListener('resize', resizeGame);
+window.addEventListener('orientationchange', () => setTimeout(resizeGame, 100));
+resizeGame();
 
 // ===================== SOUND SYSTEM =====================
 let soundEnabled = true;
@@ -515,6 +730,73 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('keyup', e => { keys[e.code] = false; });
 
+// ===================== MOBILE TOUCH CONTROLS =====================
+const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let activeDpadDir = null;
+
+function setupMobileControls() {
+  // D-pad buttons
+  document.querySelectorAll('.dpad-btn').forEach(btn => {
+    const dir = btn.dataset.dir;
+
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      if (activeDpadDir && activeDpadDir !== dir) {
+        keys[activeDpadDir] = false;
+        document.querySelector(`.dpad-btn[data-dir="${activeDpadDir}"]`)?.classList.remove('active');
+      }
+      activeDpadDir = dir;
+      keys[dir] = true;
+      btn.classList.add('active');
+    }, { passive: false });
+
+    btn.addEventListener('touchend', e => {
+      e.preventDefault();
+      keys[dir] = false;
+      btn.classList.remove('active');
+      if (activeDpadDir === dir) activeDpadDir = null;
+    }, { passive: false });
+
+    btn.addEventListener('touchcancel', e => {
+      keys[dir] = false;
+      btn.classList.remove('active');
+      if (activeDpadDir === dir) activeDpadDir = null;
+    });
+  });
+
+  // Fire (bomb) button
+  const fireBtn = document.getElementById('fireBtn');
+  fireBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    keys['Space'] = true;
+    fireBtn.classList.add('active');
+  }, { passive: false });
+  fireBtn.addEventListener('touchend', e => {
+    e.preventDefault();
+    fireBtn.classList.remove('active');
+    keys['Space'] = false;
+  }, { passive: false });
+  fireBtn.addEventListener('touchcancel', e => {
+    fireBtn.classList.remove('active');
+    keys['Space'] = false;
+  });
+
+  // Pause button
+  document.getElementById('mobilePauseBtn').addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (gameRunning) togglePause();
+  }, { passive: false });
+
+  // Prevent canvas touch from scrolling
+  canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+  canvas.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+
+  // Prevent context menu on long press
+  document.getElementById('mobileControls').addEventListener('contextmenu', e => e.preventDefault());
+}
+
+if (isMobile) setupMobileControls();
+
 function generateMap(lvl) {
   const m = [];
   for (let r = 0; r < ROWS; r++) {
@@ -629,6 +911,7 @@ function updateUI() {
   document.getElementById('bomb-count').textContent = bombMax;
   document.getElementById('fire-power').textContent = firePower;
   document.getElementById('kick-power').textContent = kickPower;
+  updateMobileHud();
 }
 
 function getTile(x, y) {
