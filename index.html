@@ -17,6 +17,7 @@
   --color-tank: #e8b800;
   --color-range: #f44336;
   --color-bomber: #ff8c00;
+  --color-monopoly: #36c978;
 }
 
 * {
@@ -150,6 +151,7 @@ body::before {
 .cabinet.tank:hover { border-color: var(--color-tank); }
 .cabinet.range:hover { border-color: var(--color-range); }
 .cabinet.bomber:hover { border-color: var(--color-bomber); }
+.cabinet.monopoly:hover { border-color: var(--color-monopoly); }
 
 .cabinet-top {
   display: flex;
@@ -354,9 +356,27 @@ body::before {
       </div>
       <a class="launch" href="bomberman.html" data-i18n="bomber.cta">Drop In</a>
     </article>
+
+    <article class="cabinet monopoly">
+      <div class="cabinet-top">
+        <div class="cabinet-label" data-i18n="monopoly.label">Cabinet 04 / Board Game</div>
+        <div class="cabinet-score" data-i18n="monopoly.score">Roll Ready</div>
+      </div>
+      <div class="screen">
+        <img src="images/houstonopoly-thumb.JPG" alt="Houston Monopoly Preview" loading="lazy">
+      </div>
+      <h2 data-i18n="monopoly.title">Houston Monopoly</h2>
+      <p data-i18n="monopoly.body">Roll through a Houston-themed property battle, buy landmarks, draw event cards, and outlast your rivals with smart deals.</p>
+      <div class="meta">
+        <span data-i18n="monopoly.tag1">City Landmark Board</span>
+        <span data-i18n="monopoly.tag2">Chance Card Twists</span>
+        <span data-i18n="monopoly.tag3">Hotseat Strategy</span>
+      </div>
+      <a class="launch" href="houston-monopoly.html" data-i18n="monopoly.cta">Play Round</a>
+    </article>
   </section>
 
-  <div class="footer-note" data-i18n="footer.note">© 2026 Hui-Ying Chung. Created in collaboration with AI.</div>
+  <div class="footer-note" data-i18n="footer.note">© 2026 Huiying Chung. Created in collaboration with AI.</div>
 </main>
 <script>
 const translations = {
@@ -401,8 +421,18 @@ const translations = {
       tag3: 'Multi-Level Run',
       cta: 'Drop In'
     },
+    monopoly: {
+      label: 'Cabinet 04 / Board Game',
+      score: 'Roll Ready',
+      title: 'Houston Monopoly',
+      body: 'Roll through a Houston-themed property battle, buy landmarks, draw event cards, and outlast your rivals with smart deals.',
+      tag1: 'City Landmark Board',
+      tag2: 'Chance Card Twists',
+      tag3: 'Hotseat Strategy',
+      cta: 'Play Round'
+    },
     footer: {
-      note: '© 2026 Hui-Ying Chung. Created in collaboration with AI.'
+      note: '© 2026 Huiying Chung. Created in collaboration with AI.'
     }
   },
   zh: {
@@ -446,8 +476,18 @@ const translations = {
       tag3: '多關卡挑戰',
       cta: '立即闖關'
     },
+    monopoly: {
+      label: '04 號機 / 桌遊對戰',
+      score: '準備擲骰子',
+      title: '休士頓大富翁',
+      body: '在休士頓主題的地產對戰裡擲骰子前進，買下地標、抽事件卡，用策略與交易撐到最後。',
+      tag1: '城市地標棋盤',
+      tag2: '機會卡變化',
+      tag3: '同螢幕策略對戰',
+      cta: '開始一局'
+    },
     footer: {
-      note: '© 2026 Hui-Ying Chung。與 AI 協作製作。'
+      note: '© 2026 Huiying Chung。與 AI 協作製作。'
     }
   }
 };

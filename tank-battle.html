@@ -9,19 +9,17 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   background: #0a0a0a;
-  display: flex;
-  justify-content: center;
-  align-items: start;
   min-height: 100vh;
   font-family: 'Press Start 2P', 'Courier New', monospace;
   color: #fff;
   overflow: hidden;
+  position: relative;
 }
 #gameContainer {
-  position: relative;
+  position: absolute;
   display: flex;
   gap: 0;
-  transform-origin: top center;
+  transform-origin: top left;
 }
 canvas {
   display: block;
@@ -236,6 +234,148 @@ hr.ui-divider {
   border-radius: 3px;
 }
 #soundToggle:hover { background: rgba(50,50,50,0.8); }
+
+/* ============= MOBILE TOUCH CONTROLS ============= */
+#mobileControls {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 160px;
+  z-index: 30;
+  pointer-events: none;
+  padding: 10px 16px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 80%, transparent 100%);
+}
+#mobileControls > * { pointer-events: auto; }
+.dpad {
+  position: absolute;
+  left: 20px;
+  bottom: 16px;
+  width: 140px;
+  height: 140px;
+}
+.dpad-btn {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  background: rgba(255,255,255,0.18);
+  border: 2px solid rgba(255,255,255,0.35);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: rgba(255,255,255,0.8);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: background 0.08s;
+}
+.dpad-btn.active { background: rgba(255,215,0,0.45); border-color: rgba(255,215,0,0.7); }
+.dpad-up { left: 47px; top: 0; }
+.dpad-down { left: 47px; bottom: 0; }
+.dpad-left { left: 0; top: 47px; }
+.dpad-right { right: 0; top: 47px; }
+.dpad-center { left: 47px; top: 47px; width: 46px; height: 46px; border-radius: 8px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+.fire-btn {
+  position: absolute;
+  right: 24px;
+  bottom: 36px;
+  width: 72px;
+  height: 72px;
+  background: rgba(255,60,60,0.3);
+  border: 3px solid rgba(255,80,80,0.6);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-family: 'Press Start 2P', monospace;
+  color: rgba(255,100,100,0.95);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  transition: background 0.08s;
+  box-shadow: 0 0 12px rgba(255,60,60,0.3);
+}
+.fire-btn.active { background: rgba(255,60,60,0.6); border-color: rgba(255,100,100,0.9); box-shadow: 0 0 20px rgba(255,60,60,0.5); }
+.mobile-pause {
+  position: absolute;
+  right: 110px;
+  bottom: 50px;
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: rgba(255,255,255,0.7);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+/* Mobile HUD bar (replaces sidebar on mobile) */
+#mobileHud {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 36px;
+  background: rgba(10,10,20,0.9);
+  border-bottom: 1px solid #333;
+  z-index: 25;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  color: #aab;
+}
+#mobileHud .mh-item { display: flex; align-items: center; gap: 4px; }
+#mobileHud .mh-val { color: #4f4; }
+#mobileHud .mh-lives { color: #f44; }
+
+/* ============= MEDIA QUERIES ============= */
+@media (max-width: 780px) {
+  body { align-items: start; }
+  #ui { display: none !important; }
+  #mobileControls { display: block; }
+  #mobileHud { display: flex; }
+  #startScreen h1 { font-size: 20px; }
+  #startScreen h2 { font-size: 8px; margin-bottom: 16px; }
+  #gameOverScreen h1 { font-size: 22px; }
+  .btn { padding: 10px 24px; font-size: 10px; }
+  .controls { font-size: 7px; }
+  #soundToggle { right: 8px !important; top: 42px; }
+}
+@media (max-width: 480px) {
+  #startScreen h1 { font-size: 16px; }
+  .btn { padding: 8px 18px; font-size: 9px; }
+  .dpad { left: 10px; bottom: 10px; width: 120px; height: 120px; }
+  .dpad-btn { width: 38px; height: 38px; font-size: 14px; }
+  .dpad-up { left: 41px; top: 0; }
+  .dpad-down { left: 41px; bottom: 0; }
+  .dpad-left { left: 0; top: 41px; }
+  .dpad-right { right: 0; top: 41px; }
+  .dpad-center { left: 41px; top: 41px; width: 38px; height: 38px; }
+  .fire-btn { width: 60px; height: 60px; right: 16px; bottom: 28px; font-size: 8px; }
+  .mobile-pause { right: 90px; bottom: 40px; width: 36px; height: 36px; font-size: 14px; }
+}
+@media (max-height: 500px) and (orientation: landscape) {
+  #mobileHud { height: 28px; font-size: 7px; }
+  #mobileControls { height: 120px; }
+  .dpad { width: 110px; height: 110px; bottom: 5px; left: 10px; }
+  .dpad-btn { width: 34px; height: 34px; font-size: 13px; }
+  .dpad-up { left: 38px; top: 0; }
+  .dpad-down { left: 38px; bottom: 0; }
+  .dpad-left { left: 0; top: 38px; }
+  .dpad-right { right: 0; top: 38px; }
+  .dpad-center { left: 38px; top: 38px; width: 34px; height: 34px; }
+  .fire-btn { width: 56px; height: 56px; right: 16px; bottom: 20px; }
+  .mobile-pause { right: 86px; bottom: 26px; width: 34px; height: 34px; }
+}
 </style>
 </head>
 <body>
@@ -302,6 +442,28 @@ hr.ui-divider {
   </div>
 
   <button id="soundToggle" onclick="toggleSound()">🔊</button>
+</div>
+
+<!-- Mobile HUD bar -->
+<div id="mobileHud">
+  <div class="mh-item">LV <span class="mh-val" id="mhLevel">1</span></div>
+  <div class="mh-item">♥ <span class="mh-lives" id="mhLives">3</span></div>
+  <div class="mh-item">SCORE <span class="mh-val" id="mhScore">0</span></div>
+  <div class="mh-item">KILLS <span class="mh-val" id="mhKills">0</span></div>
+  <div class="mh-item">EN <span class="mh-val" id="mhEnemies">0</span></div>
+</div>
+
+<!-- Mobile Touch Controls -->
+<div id="mobileControls">
+  <div class="dpad">
+    <div class="dpad-btn dpad-up" data-dir="ArrowUp">▲</div>
+    <div class="dpad-btn dpad-left" data-dir="ArrowLeft">◄</div>
+    <div class="dpad-center"></div>
+    <div class="dpad-btn dpad-right" data-dir="ArrowRight">►</div>
+    <div class="dpad-btn dpad-down" data-dir="ArrowDown">▼</div>
+  </div>
+  <div class="fire-btn" id="fireBtn">FIRE</div>
+  <div class="mobile-pause" id="mobilePauseBtn">⏸</div>
 </div>
 
 <script>
@@ -1526,6 +1688,8 @@ function updateUI(force) {
     prevUI.er = enemiesRemaining;
     prevUI.me = maxEnemies;
   }
+  // Mobile HUD
+  if (window.innerWidth < 780) updateMobileHud();
 }
 
 function endGame(won) {
@@ -1551,49 +1715,133 @@ document.addEventListener('keydown', e => {
 });
 document.addEventListener('keyup', e => { keys[e.key] = false; });
 
-// Touch controls
-let touchDir = null;
-canvas.addEventListener('touchstart', e => {
-  e.preventDefault();
-  initAudio();
-  const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  const tx = touch.clientX - rect.left, ty = touch.clientY - rect.top;
-  if (player && player.alive) {
-    const dx = tx - player.x, dy = ty - player.y;
-    if (Math.abs(dx) < 30 && Math.abs(dy) < 30) player.fire();
-    else {
-      touchDir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'ArrowRight' : 'ArrowLeft') : (dy > 0 ? 'ArrowDown' : 'ArrowUp');
-      keys[touchDir] = true;
-    }
-  }
-});
-canvas.addEventListener('touchend', e => { if (touchDir) { keys[touchDir] = false; touchDir = null; } });
+// ============= MOBILE TOUCH CONTROLS =============
+const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let activeDpadDir = null;
+
+function setupMobileControls() {
+  // D-pad buttons
+  document.querySelectorAll('.dpad-btn').forEach(btn => {
+    const dir = btn.dataset.dir;
+
+    btn.addEventListener('touchstart', e => {
+      e.preventDefault();
+      initAudio();
+      // Release previous direction
+      if (activeDpadDir && activeDpadDir !== dir) {
+        keys[activeDpadDir] = false;
+        document.querySelector(`.dpad-btn[data-dir="${activeDpadDir}"]`)?.classList.remove('active');
+      }
+      activeDpadDir = dir;
+      keys[dir] = true;
+      btn.classList.add('active');
+    }, { passive: false });
+
+    btn.addEventListener('touchend', e => {
+      e.preventDefault();
+      keys[dir] = false;
+      btn.classList.remove('active');
+      if (activeDpadDir === dir) activeDpadDir = null;
+    }, { passive: false });
+
+    btn.addEventListener('touchcancel', e => {
+      keys[dir] = false;
+      btn.classList.remove('active');
+      if (activeDpadDir === dir) activeDpadDir = null;
+    });
+  });
+
+  // Fire button - continuous fire while held
+  const fireBtn = document.getElementById('fireBtn');
+  let fireInterval = null;
+  fireBtn.addEventListener('touchstart', e => {
+    e.preventDefault();
+    initAudio();
+    fireBtn.classList.add('active');
+    keys[' '] = true;
+  }, { passive: false });
+  fireBtn.addEventListener('touchend', e => {
+    e.preventDefault();
+    fireBtn.classList.remove('active');
+    keys[' '] = false;
+  }, { passive: false });
+  fireBtn.addEventListener('touchcancel', e => {
+    fireBtn.classList.remove('active');
+    keys[' '] = false;
+  });
+
+  // Pause button
+  document.getElementById('mobilePauseBtn').addEventListener('touchstart', e => {
+    e.preventDefault();
+    if (gameState === 'playing' || gameState === 'paused') togglePause();
+  }, { passive: false });
+
+  // Prevent canvas touch from scrolling
+  canvas.addEventListener('touchstart', e => e.preventDefault(), { passive: false });
+  canvas.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+}
+
+if (isMobile) setupMobileControls();
 
 // ============= RESPONSIVE SCALING =============
 const UI_WIDTH = 190;
 function resizeGame() {
   const container = document.getElementById('gameContainer');
-  const ui = document.getElementById('ui');
   const vw = window.innerWidth;
   const vh = window.innerHeight;
+  const isMobileView = vw < 780;
 
-  const hideUI = vw < 780;
-  ui.style.display = hideUI ? 'none' : '';
+  // Update overlay widths
   document.querySelectorAll('#startScreen,#gameOverScreen,#pauseScreen').forEach(el => {
-    el.style.width = hideUI ? '100%' : `calc(100% - ${UI_WIDTH}px)`;
+    el.style.width = isMobileView ? '100%' : `calc(100% - ${UI_WIDTH}px)`;
   });
-  document.getElementById('soundToggle').style.right = hideUI ? '8px' : (UI_WIDTH + 8) + 'px';
-  const baseW = COLS * TILE + (hideUI ? 0 : UI_WIDTH) + 6;
+
+  // Reserved space for mobile UI elements
+  const mobileHudH = isMobileView ? 36 : 0;
+  const mobileCtrlH = isMobileView ? 160 : 0;
+
+  // Calculate available space
+  const baseW = COLS * TILE + (isMobileView ? 0 : UI_WIDTH) + 6;
   const baseH = ROWS * TILE + 6;
-  const pad = 16;
-  const scale = Math.min((vw - pad) / baseW, (vh - pad) / baseH, 1.5);
+  const availW = vw;
+  const availH = vh - mobileHudH - mobileCtrlH;
+  const maxScale = isMobileView ? 1.5 : 1.2;
+  const scale = Math.min(availW / baseW, availH / baseH, maxScale);
+
+  // Center using transform: ensures pixel-perfect centering at any scale
+  const scaledW = baseW * scale;
   const scaledH = baseH * scale;
-  const topMargin = Math.max(0, (vh - scaledH) / 2);
-  container.style.transform = `scale(${scale})`;
-  container.style.marginTop = topMargin + 'px';
+  const left = (vw - scaledW) / 2;
+  const top = isMobileView
+    ? mobileHudH + Math.max(0, (availH - scaledH) * 0.2)
+    : Math.max(0, (vh - scaledH) / 2);
+
+  container.style.position = 'absolute';
+  container.style.left = '0';
+  container.style.top = '0';
+  container.style.margin = '0';
+  container.style.transform = `translate(${left}px, ${top}px) scale(${scale})`;
+  container.style.transformOrigin = 'top left';
+
+  // Update mobile HUD
+  if (isMobileView) updateMobileHud();
 }
+
+function updateMobileHud() {
+  const mhLevel = document.getElementById('mhLevel');
+  const mhLives = document.getElementById('mhLives');
+  const mhScore = document.getElementById('mhScore');
+  const mhKills = document.getElementById('mhKills');
+  const mhEnemies = document.getElementById('mhEnemies');
+  if (mhLevel) mhLevel.textContent = level;
+  if (mhLives) mhLives.textContent = lives;
+  if (mhScore) mhScore.textContent = score;
+  if (mhKills) mhKills.textContent = kills;
+  if (mhEnemies) mhEnemies.textContent = enemiesRemaining;
+}
+
 window.addEventListener('resize', resizeGame);
+window.addEventListener('orientationchange', () => setTimeout(resizeGame, 100));
 resizeGame();
 </script>
 </body>
