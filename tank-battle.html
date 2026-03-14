@@ -77,6 +77,14 @@ canvas {
 #pauseScreen {
   background: rgba(0,0,20,0.85);
   backdrop-filter: blur(3px);
+  gap: 12px;
+  padding: 24px 16px;
+}
+#pauseScreen .btn {
+  min-width: 220px;
+  min-height: 48px;
+  margin: 0;
+  line-height: 1.4;
 }
 #startScreen h1 {
   font-size: 32px;
@@ -346,12 +354,26 @@ hr.ui-divider {
   #startScreen h2 { font-size: 8px; margin-bottom: 16px; }
   #gameOverScreen h1 { font-size: 22px; }
   .btn { padding: 10px 24px; font-size: 10px; }
+  #pauseScreen { gap: 14px; padding: 24px 20px; }
+  #pauseScreen .btn {
+    width: min(82vw, 320px);
+    min-width: 0;
+    min-height: 52px;
+    padding: 14px 18px;
+  }
   .controls { font-size: 7px; }
   #soundToggle { right: 8px !important; top: 42px; }
 }
 @media (max-width: 480px) {
   #startScreen h1 { font-size: 16px; }
   .btn { padding: 8px 18px; font-size: 9px; }
+  #pauseScreen { gap: 16px; padding: 20px 16px; }
+  #pauseScreen .btn {
+    width: min(86vw, 300px);
+    min-height: 54px;
+    padding: 14px 16px;
+    font-size: 10px;
+  }
   .dpad { left: 10px; bottom: 8px; width: 170px; height: 170px; }
   .dpad-btn { width: 54px; height: 54px; font-size: 18px; }
   .dpad-up { left: 58px; top: 0; }
