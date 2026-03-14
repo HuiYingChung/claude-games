@@ -1,9 +1,7 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cp -r \"/c/Users/Winnie/Dropbox/PC/Documents/huiyingchung.github.io/codex-games/badminton-timing-game\" \"/c/Users/Winnie/Dropbox/PC/Documents/huiyingchung.github.io/claude-games/\")",
-      "Bash(cp -r \"/c/Users/Winnie/Dropbox/PC/Documents/huiyingchung.github.io/codex-games/mario\" \"/c/Users/Winnie/Dropbox/PC/Documents/huiyingchung.github.io/claude-games/\")",
-      "Bash(cp -r \"/c/Users/Winnie/Dropbox/PC/Documents/huiyingchung.github.io/codex-games/tetris\" \"/c/Users/Winnie/Dropbox/PC/Documents/huiyingchung.github.io/claude-games/\")"
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }

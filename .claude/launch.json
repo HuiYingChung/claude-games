@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "bomberman-dev",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "require('http').createServer((q,r)=>{const fs=require('fs'),p=require('path'),f=p.join('.',q.url==='/'?'/bomberman.html':q.url),e=p.extname(f),t={'.html':'text/html','.js':'text/javascript','.css':'text/css'};fs.readFile(f,(err,d)=>{if(err){r.writeHead(404);r.end()}else{r.writeHead(200,{'Content-Type':t[e]||'text/plain'});r.end(d)}})}).listen(3456)"],
+      "port": 3456
+    }
+    ,{
+      "name": "shooting-range",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "require('http').createServer((q,r)=>{const fs=require('fs'),p=require('path'),f=p.join('.',q.url==='/'?'/shooting-range.html':q.url),e=p.extname(f),t={'.html':'text/html','.js':'text/javascript','.css':'text/css'};fs.readFile(f,(err,d)=>{if(err){r.writeHead(404);r.end()}else{r.writeHead(200,{'Content-Type':t[e]||'text/plain'});r.end(d)}})}).listen(3457)"],
+      "port": 3457
+    }
+    ,{
+      "name": "tank-game",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["-e", "require('http').createServer((q,r)=>{const fs=require('fs'),p=require('path'),f=p.join('.',q.url==='/'?'/tank-battle.html':q.url),e=p.extname(f),t={'.html':'text/html','.js':'text/javascript','.css':'text/css'};fs.readFile(f,(err,d)=>{if(err){r.writeHead(404);r.end()}else{r.writeHead(200,{'Content-Type':t[e]||'text/plain'});r.end(d)}})}).listen(3458)"],
+      "port": 3458
+    }
+  ]
+}

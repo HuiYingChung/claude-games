@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Games Collection</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+
+:root {
+  --bg: #0e0e11;
+  --surface: #16161b;
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.2);
+  --text-main: #f0f0f2;
+  --text-muted: #8b8b94;
+  --color-tank: #e8b800;
+  --color-range: #f44336;
+  --color-bomber: #ff8c00;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  min-height: 100vh;
+  font-family: 'Noto Sans TC', 'Segoe UI', sans-serif;
+  color: var(--text-main);
+  background-color: var(--bg);
+  background-image: radial-gradient(circle at 50% 0%, #1a1a24 0%, var(--bg) 80%);
+  overflow-x: hidden;
+}
+
+/* Subtle dot grid background */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.arcade-shell {
+  width: min(1080px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 60px 0;
+}
+
+.hero {
+  margin-bottom: 48px;
+}
+
+.hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.marquee {
+  display: inline-block;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.lang-toggle {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-main);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-toggle:hover {
+  background: var(--text-main);
+  color: var(--bg);
+}
+
+.hero h1 {
+  max-width: 16ch;
+  margin-bottom: 24px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.3;
+  text-shadow: 4px 4px 0px rgba(0, 0, 0, 0.4);
+}
+
+.hero p {
+  max-width: 680px;
+  color: var(--text-muted);
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.status-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.status-chip {
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-muted);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-bottom: 48px;
+}
+
+.cabinet {
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--surface);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cabinet:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-hover);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+}
+
+.cabinet.tank:hover { border-color: var(--color-tank); }
+.cabinet.range:hover { border-color: var(--color-range); }
+.cabinet.bomber:hover { border-color: var(--color-bomber); }
+
+.cabinet-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.cabinet-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.cabinet-score {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 9px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+}
+
+.screen {
+  height: 160px;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #09090b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* CRT 掃描線特效 (Scanlines) */
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+  transition: opacity 0.3s ease, transform 0.5s ease;
+}
+
+.cabinet:hover .screen img {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.cabinet h2 {
+  margin-bottom: 12px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 18px;
+  line-height: 1.4;
+}
+
+.cabinet p {
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1.8;
+  margin-bottom: 24px;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.meta span {
+  padding: 4px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-muted);
+  font-size: 11px;
+}
+
+.launch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-decoration: none;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 10px;
+  color: var(--text-main);
+  background: transparent;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.tank .launch:hover { background: var(--color-tank); color: #000; border-color: var(--color-tank); }
+.range .launch:hover { background: var(--color-range); color: #fff; border-color: var(--color-range); }
+.bomber .launch:hover { background: var(--color-bomber); color: #000; border-color: var(--color-bomber); }
+
+.footer-note {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+}
+
+@media (max-width: 980px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .arcade-shell { padding: 40px 0; }
+  .hero { margin-bottom: 32px; }
+  .hero h1 { font-size: 24px; }
+  .hero p { font-size: 14px; margin-bottom: 24px; }
+  .card-grid { grid-template-columns: 1fr; gap: 16px; }
+  .cabinet { padding: 20px; }
+}
+</style>
+</head>
+<body>
+<main class="arcade-shell">
+  <section class="hero">
+    <div class="hero-top">
+      <div class="marquee" data-i18n="hero.marquee">Local Games / Browser Collection</div>
+      <button id="lang-toggle" class="lang-toggle" type="button">中文</button>
+    </div>
+    <h1 data-i18n="hero.title">Choose a Game.</h1>
+    <p data-i18n="hero.body">These are small games I made with AI. Most of them are recreations of classic games, and you are welcome to try them out. For the best experience, please use a desktop browser with a keyboard and mouse.</p>
+    <div class="status-row">
+      <div class="status-chip" data-i18n="hero.chip1">AI-made games</div>
+      <div class="status-chip" data-i18n="hero.chip2">Classic recreations</div>
+      <div class="status-chip" data-i18n="hero.chip3">More coming soon</div>
+    </div>
+  </section>
+
+  <section class="card-grid">
+    <article class="cabinet tank">
+      <div class="cabinet-top">
+        <div class="cabinet-label" data-i18n="tank.label">Cabinet 01 / Defense</div>
+        <div class="cabinet-score" data-i18n="tank.score">1P Ready</div>
+      </div>
+      <div class="screen">
+        <img src="images/tank-battle-thumb.JPG" alt="Tank Battle Preview" loading="lazy">
+      </div>
+      <h2 data-i18n="tank.title">Tank Battle</h2>
+      <p data-i18n="tank.body">A retro tank defense challenge where you protect the base, wipe out enemy units, and push through tougher stages.</p>
+      <div class="meta">
+        <span data-i18n="tank.tag1">Battle City Style</span>
+        <span data-i18n="tank.tag2">Real-Time Dodging</span>
+        <span data-i18n="tank.tag3">Stage Progression</span>
+      </div>
+      <a class="launch" href="tank-battle.html" data-i18n="tank.cta">Start Mission</a>
+    </article>
+
+    <article class="cabinet range">
+      <div class="cabinet-top">
+        <div class="cabinet-label" data-i18n="range.label">Station 02 / 3D Shooter</div>
+        <div class="cabinet-score" data-i18n="range.score">Target Locked</div>
+      </div>
+      <div class="screen">
+        <img src="images/shooting-range-thumb.JPG" alt="Shooting Range Preview" loading="lazy">
+      </div>
+      <h2 data-i18n="range.title">Shooting Range</h2>
+      <p data-i18n="range.body">Hit as many long-range targets as you can before time runs out, then stack accuracy and combos for a higher score.</p>
+      <div class="meta">
+        <span data-i18n="range.tag1">3D Target Practice</span>
+        <span data-i18n="range.tag2">Time Challenge</span>
+        <span data-i18n="range.tag3">Combo Bonus</span>
+      </div>
+      <a class="launch" href="shooting-range.html" data-i18n="range.cta">Enter Range</a>
+    </article>
+
+    <article class="cabinet bomber">
+      <div class="cabinet-top">
+        <div class="cabinet-label" data-i18n="bomber.label">Cabinet 03 / Maze Action</div>
+        <div class="cabinet-score" data-i18n="bomber.score">Stage Clear</div>
+      </div>
+      <div class="screen">
+        <img src="images/bomberman-thumb.JPG" alt="Bomberman Preview" loading="lazy">
+      </div>
+      <h2 data-i18n="bomber.title">Bomberman</h2>
+      <p data-i18n="bomber.body">Drop bombs in a maze, clear enemies, and uncover the exit in a fast-paced run that rewards smart movement.</p>
+      <div class="meta">
+        <span data-i18n="bomber.tag1">Maze Bomb Battle</span>
+        <span data-i18n="bomber.tag2">Power-up Hunt</span>
+        <span data-i18n="bomber.tag3">Multi-Level Run</span>
+      </div>
+      <a class="launch" href="bomberman.html" data-i18n="bomber.cta">Drop In</a>
+    </article>
+  </section>
+
+  <div class="footer-note" data-i18n="footer.note">© 2026 Hui-Ying Chung. Created in collaboration with AI.</div>
+</main>
+<script>
+const translations = {
+  en: {
+    title: 'Claude Games Arcade',
+    toggle: '中文',
+    hero: {
+      marquee: 'Local Arcade / Game Select',
+      title: 'Choose Your Cabinet.',
+      body: 'These are small games I made with AI. Most of them are recreations of classic games, and you are welcome to try them out. For the best experience, please use a desktop browser with a keyboard and mouse.',
+      chip1: 'AI-made games',
+      chip2: 'Classic recreations',
+      chip3: 'More coming soon'
+    },
+    tank: {
+      label: 'Cabinet 01 / Defense',
+      score: '1P Ready',
+      title: 'Tank Battle',
+      body: 'A retro tank defense challenge where you protect the base, wipe out enemy units, and push through tougher stages.',
+      tag1: 'Battle City Style',
+      tag2: 'Real-Time Dodging',
+      tag3: 'Stage Progression',
+      cta: 'Start Mission'
+    },
+    range: {
+      label: 'Cabinet 02 / Precision',
+      score: 'High Score',
+      title: 'Shooting Range',
+      body: 'Hit as many long-range targets as you can before time runs out, then stack accuracy and combos for a higher score.',
+      tag1: '3D Target Practice',
+      tag2: 'Time Challenge',
+      tag3: 'Combo Bonus',
+      cta: 'Enter Range'
+    },
+    bomber: {
+      label: 'Cabinet 03 / Maze Action',
+      score: 'Stage Clear',
+      title: 'Bomberman',
+      body: 'Drop bombs in a maze, clear enemies, and uncover the exit in a fast-paced run that rewards smart movement.',
+      tag1: 'Maze Bomb Battle',
+      tag2: 'Power-up Hunt',
+      tag3: 'Multi-Level Run',
+      cta: 'Drop In'
+    },
+    footer: {
+      note: '© 2026 Hui-Ying Chung. Created in collaboration with AI.'
+    }
+  },
+  zh: {
+    title: 'Claude Games Arcade',
+    toggle: 'EN',
+    hero: {
+      marquee: '本地街機 / 遊戲選單',
+      title: '選擇你的機台。',
+      body: '這些是我用 AI 製作的小遊戲，大部分是複刻一些經典遊戲，歡迎測試。為了獲得最佳體驗，建議使用桌機瀏覽器，並搭配鍵盤與滑鼠操作。',
+      chip1: 'AI 製作遊戲',
+      chip2: '經典複刻',
+      chip3: '之後還會增加'
+    },
+    tank: {
+      label: '01 號機 / 防守戰',
+      score: '1P 準備中',
+      title: '坦克大戰',
+      body: '復古戰車防守玩法，守住基地、清掉敵軍，並一路推進到更困難的關卡。',
+      tag1: 'Battle City 風格',
+      tag2: '即時閃避',
+      tag3: '關卡推進',
+      cta: '開始任務'
+    },
+    range: {
+      label: '02 號機 / 精準射擊',
+      score: '最高分挑戰',
+      title: '射擊場',
+      body: '在時間歸零前盡可能命中更多遠距目標，再靠準度與連擊把分數往上衝。',
+      tag1: '3D 射擊練習',
+      tag2: '時間挑戰',
+      tag3: '連擊加成',
+      cta: '進入靶場'
+    },
+    bomber: {
+      label: '03 號機 / 迷宮動作',
+      score: '破關挑戰',
+      title: '炸彈超人',
+      body: '在迷宮裡放置炸彈、清掉敵人並找出出口，節奏快速，而且很考驗走位。',
+      tag1: '迷宮炸彈戰',
+      tag2: '道具蒐集',
+      tag3: '多關卡挑戰',
+      cta: '立即闖關'
+    },
+    footer: {
+      note: '© 2026 Hui-Ying Chung。與 AI 協作製作。'
+    }
+  }
+};
+
+function getCopy(lang, key) {
+  return key.split('.').reduce((value, part) => value[part], translations[lang]);
+}
+
+function applyLanguage(lang) {
+  document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : 'en';
+  document.title = translations[lang].title;
+
+  document.querySelectorAll('[data-i18n]').forEach(element => {
+    element.textContent = getCopy(lang, element.dataset.i18n);
+  });
+
+  document.getElementById('lang-toggle').textContent = translations[lang].toggle;
+  window.localStorage.setItem('landing-language', lang);
+}
+
+const savedLanguage = window.localStorage.getItem('landing-language');
+let currentLanguage = savedLanguage === 'zh' ? 'zh' : 'en';
+applyLanguage(currentLanguage);
+
+document.getElementById('lang-toggle').addEventListener('click', () => {
+  currentLanguage = currentLanguage === 'en' ? 'zh' : 'en';
+  applyLanguage(currentLanguage);
+});
+</script>
+</body>
+</html>
