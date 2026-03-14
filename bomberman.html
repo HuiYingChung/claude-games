@@ -897,6 +897,13 @@ function startGame() {
   particles = []; gamePaused = false;
   document.getElementById('btn-pause').textContent = '⏸ Pause';
   initLevel();
+  resizeGame();
+  try {
+    draw();
+  } catch (err) {
+    reportFatalGameError(err, 'startGame/draw');
+    return;
+  }
   gameRunning = true;
   requestAnimationFrame(gameLoop);
 }
@@ -1586,10 +1593,37 @@ function drawPauseOverlay() {
   ctx.fillText('Press ESC or click Resume to continue', canvas.width/2, canvas.height/2 + 20);
 }
 
+function reportFatalGameError(err, phase) {
+  gameRunning = false;
+  gamePaused = false;
+  console.error(`[Bomberman] Fatal error during ${phase}`, err);
+  ctx.save();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#120f1f';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = '#ff8a65';
+  ctx.font = 'bold 20px "Noto Sans TC", sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('Game Error', canvas.width / 2, canvas.height / 2 - 28);
+  ctx.fillStyle = '#f5d7cf';
+  ctx.font = '14px "Noto Sans TC", sans-serif';
+  const message = String(err?.message || err || 'Unknown error');
+  ctx.fillText(message.slice(0, 70), canvas.width / 2, canvas.height / 2 + 4);
+  ctx.fillStyle = '#b9a8a0';
+  ctx.fillText(`phase: ${phase}`, canvas.width / 2, canvas.height / 2 + 28);
+  ctx.restore();
+}
+
 function gameLoop() {
   if (!gameRunning || gamePaused) return;
-  update();
-  draw();
+  try {
+    update();
+    draw();
+  } catch (err) {
+    reportFatalGameError(err, 'gameLoop');
+    return;
+  }
   requestAnimationFrame(gameLoop);
 }
 
