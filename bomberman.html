@@ -733,6 +733,7 @@ document.addEventListener('keyup', e => { keys[e.code] = false; });
 // ===================== MOBILE TOUCH CONTROLS =====================
 const isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 let activeDpadDir = null;
+let mobilePendingBomb = false;
 
 function setupMobileControls() {
   // D-pad buttons
@@ -768,7 +769,7 @@ function setupMobileControls() {
   const fireBtn = document.getElementById('fireBtn');
   fireBtn.addEventListener('touchstart', e => {
     e.preventDefault();
-    keys['Space'] = true;
+    mobilePendingBomb = true;
     fireBtn.classList.add('active');
   }, { passive: false });
   fireBtn.addEventListener('touchend', e => {
@@ -1201,6 +1202,10 @@ function update() {
     else if (movingRight) player.lastDir = 3;
 
     if (keys['Space']) { placeBomb(); keys['Space'] = false; }
+    if (isMobile && mobilePendingBomb) {
+      placeBomb();
+      mobilePendingBomb = false;
+    }
   }
 
   bombs.forEach(b => { if (!b.exploded) { b.timer--; if (b.timer <= 0) explodeBomb(b); } });
