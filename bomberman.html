@@ -295,6 +295,40 @@ button:active { transform: translateY(0); }
   h1 { display: none; }
   #info-bar { display: none; }
   #action-bar { display: none !important; }
+  #start-screen, #game-over-screen {
+    width: min(90vw, 430px);
+    max-width: 90vw;
+    padding: 26px 24px;
+    border-radius: 22px;
+  }
+  #start-screen h2, #game-over-screen h2 {
+    font-size: 1.55rem;
+    margin-bottom: 14px;
+  }
+  #start-screen .controls-info,
+  #game-over-screen .result,
+  #game-over-screen > div {
+    font-size: 0.92rem;
+  }
+  #start-screen .controls-info {
+    margin: 14px 0;
+    line-height: 1.8;
+  }
+  #start-screen .screen-actions,
+  #game-over-screen .screen-actions {
+    width: 100%;
+    gap: 12px;
+    margin-top: 18px;
+  }
+  #start-screen .screen-actions button,
+  #game-over-screen .screen-actions button {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 148px;
+    min-height: 54px;
+    padding: 14px 16px;
+    font-size: 0.95rem;
+    border-radius: 14px;
+  }
   #action-bar.mobile-paused {
     display: flex !important;
     position: fixed;
@@ -337,13 +371,28 @@ button:active { transform: translateY(0); }
     width: 651px;
   }
   #start-screen, #game-over-screen {
-    max-width: 90vw;
-    padding: 18px 20px;
+    width: min(92vw, 380px);
+    padding: 22px 18px;
   }
-  .controls-info { font-size: 0.8rem; line-height: 1.5; }
+  .controls-info { font-size: 0.88rem; line-height: 1.65; }
   button { padding: 8px 24px; font-size: 0.85rem; }
 }
 @media (max-width: 480px) {
+  #start-screen, #game-over-screen {
+    width: min(94vw, 360px);
+    padding: 20px 16px;
+    border-radius: 20px;
+  }
+  #start-screen h2, #game-over-screen h2 {
+    font-size: 1.35rem;
+  }
+  #start-screen .screen-actions button,
+  #game-over-screen .screen-actions button {
+    min-width: 132px;
+    min-height: 50px;
+    padding: 12px 14px;
+    font-size: 0.88rem;
+  }
   #action-bar.mobile-paused {
     bottom: 190px;
     width: min(96vw, 372px);
