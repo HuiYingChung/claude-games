@@ -476,12 +476,16 @@ function resizeGame() {
 
 function updateMobileHud() {
   const el = id => document.getElementById(id);
-  if (el('mhLevel')) el('mhLevel').textContent = typeof level !== 'undefined' ? level : 1;
-  if (el('mhLives')) el('mhLives').textContent = typeof lives !== 'undefined' ? lives : 3;
-  if (el('mhScore')) el('mhScore').textContent = typeof score !== 'undefined' ? score : 0;
-  if (el('mhBombs')) el('mhBombs').textContent = typeof bombMax !== 'undefined' ? bombMax : 1;
-  if (el('mhFire')) el('mhFire').textContent = typeof firePower !== 'undefined' ? firePower : 1;
-  if (el('mhKick')) el('mhKick').textContent = typeof kickPower !== 'undefined' ? kickPower : 0;
+  const readValue = (getter, fallback) => {
+    try { return getter(); }
+    catch { return fallback; }
+  };
+  if (el('mhLevel')) el('mhLevel').textContent = readValue(() => level, 1);
+  if (el('mhLives')) el('mhLives').textContent = readValue(() => lives, 3);
+  if (el('mhScore')) el('mhScore').textContent = readValue(() => score, 0);
+  if (el('mhBombs')) el('mhBombs').textContent = readValue(() => bombMax, 1);
+  if (el('mhFire')) el('mhFire').textContent = readValue(() => firePower, 1);
+  if (el('mhKick')) el('mhKick').textContent = readValue(() => kickPower, 0);
 }
 
 window.addEventListener('resize', resizeGame);
