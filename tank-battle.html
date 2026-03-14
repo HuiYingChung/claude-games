@@ -106,8 +106,8 @@ canvas {
   color: #aaa;
 }
 .btn {
-  padding: 10px 30px;
-  font-size: 11px;
+  padding: 12px 34px;
+  font-size: 12px;
   background: linear-gradient(180deg, #333 0%, #1a1a1a 100%);
   color: #ffd700;
   border: 2px solid #ffd700;
@@ -142,8 +142,8 @@ canvas {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 10px;
-  margin-top: 12px;
+  gap: 16px;
+  margin-top: 16px;
 }
 .controls {
   margin-top: 20px;
@@ -251,13 +251,13 @@ hr.ui-divider {
   position: absolute;
   left: 16px;
   bottom: 10px;
-  width: 176px;
-  height: 176px;
+  width: 206px;
+  height: 206px;
 }
 .dpad-btn {
   position: absolute;
-  width: 56px;
-  height: 56px;
+  width: 66px;
+  height: 66px;
   background: rgba(255,255,255,0.18);
   border: 2px solid rgba(255,255,255,0.35);
   border-radius: 10px;
@@ -272,10 +272,10 @@ hr.ui-divider {
   transition: background 0.08s;
 }
 .dpad-btn.active { background: rgba(255,215,0,0.45); border-color: rgba(255,215,0,0.7); }
-.dpad-up { left: 60px; top: 0; }
-.dpad-down { left: 60px; bottom: 0; }
-.dpad-left { left: 0; top: 60px; }
-.dpad-right { right: 0; top: 60px; }
+.dpad-up { left: 70px; top: 0; }
+.dpad-down { left: 70px; bottom: 0; }
+.dpad-left { left: 0; top: 70px; }
+.dpad-right { right: 0; top: 70px; }
 .fire-btn {
   position: absolute;
   right: 20px;
@@ -300,8 +300,8 @@ hr.ui-divider {
 .fire-btn.active { background: rgba(255,60,60,0.6); border-color: rgba(255,100,100,0.9); box-shadow: 0 0 20px rgba(255,60,60,0.5); }
 .mobile-pause {
   position: absolute;
-  right: 116px;
-  bottom: 60px;
+  right: 150px;
+  bottom: 65px;
   width: 44px;
   height: 44px;
   background: rgba(255,255,255,0.15);
@@ -352,26 +352,26 @@ hr.ui-divider {
 @media (max-width: 480px) {
   #startScreen h1 { font-size: 16px; }
   .btn { padding: 8px 18px; font-size: 9px; }
-  .dpad { left: 10px; bottom: 8px; width: 150px; height: 150px; }
-  .dpad-btn { width: 48px; height: 48px; font-size: 18px; }
-  .dpad-up { left: 51px; top: 0; }
-  .dpad-down { left: 51px; bottom: 0; }
-  .dpad-left { left: 0; top: 51px; }
-  .dpad-right { right: 0; top: 51px; }
+  .dpad { left: 10px; bottom: 8px; width: 170px; height: 170px; }
+  .dpad-btn { width: 54px; height: 54px; font-size: 18px; }
+  .dpad-up { left: 58px; top: 0; }
+  .dpad-down { left: 58px; bottom: 0; }
+  .dpad-left { left: 0; top: 58px; }
+  .dpad-right { right: 0; top: 58px; }
   .fire-btn { width: 68px; height: 68px; right: 14px; bottom: 36px; font-size: 9px; }
-  .mobile-pause { right: 96px; bottom: 48px; width: 38px; height: 38px; font-size: 14px; }
+  .mobile-pause { right: 110px; bottom: 48px; width: 38px; height: 38px; font-size: 14px; }
 }
 @media (max-height: 500px) and (orientation: landscape) {
   #mobileHud { height: 28px; font-size: 7px; }
   #mobileControls { height: 130px; }
-  .dpad { width: 120px; height: 120px; bottom: 5px; left: 10px; }
-  .dpad-btn { width: 38px; height: 38px; font-size: 15px; }
-  .dpad-up { left: 41px; top: 0; }
-  .dpad-down { left: 41px; bottom: 0; }
-  .dpad-left { left: 0; top: 41px; }
-  .dpad-right { right: 0; top: 41px; }
+  .dpad { width: 136px; height: 136px; bottom: 5px; left: 10px; }
+  .dpad-btn { width: 44px; height: 44px; font-size: 15px; }
+  .dpad-up { left: 46px; top: 0; }
+  .dpad-down { left: 46px; bottom: 0; }
+  .dpad-left { left: 0; top: 46px; }
+  .dpad-right { right: 0; top: 46px; }
   .fire-btn { width: 60px; height: 60px; right: 16px; bottom: 24px; }
-  .mobile-pause { right: 90px; bottom: 32px; width: 36px; height: 36px; }
+  .mobile-pause { right: 96px; bottom: 32px; width: 36px; height: 36px; }
 }
 </style>
 </head>
