@@ -295,6 +295,26 @@ button:active { transform: translateY(0); }
   h1 { display: none; }
   #info-bar { display: none; }
   #action-bar { display: none !important; }
+  #action-bar.mobile-paused {
+    display: flex !important;
+    position: fixed;
+    left: 50%;
+    bottom: 198px;
+    transform: translateX(-50%);
+    z-index: 40;
+    flex-wrap: wrap;
+    width: min(92vw, 360px);
+    gap: 8px;
+    padding: 10px;
+    border-radius: 14px;
+    background: rgba(10,10,30,0.92);
+    border: 1px solid rgba(255,107,53,0.28);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.35);
+  }
+  #action-bar.mobile-paused button {
+    flex: 1 1 44%;
+    min-width: 120px;
+  }
   #mobileControls { display: block; }
   #mobileHud { display: flex; }
   html, body {
@@ -896,6 +916,7 @@ function startGame() {
   document.getElementById('start-screen').classList.add('hidden');
   document.getElementById('game-over-screen').classList.add('hidden');
   document.getElementById('action-bar').classList.remove('hidden');
+  document.getElementById('action-bar').classList.remove('mobile-paused');
   level = 1; lives = 3; score = 0;
   bombMax = 1; firePower = 1; speed = 2.5; shield = false; kickPower = 0;
   particles = []; gamePaused = false;
@@ -915,6 +936,7 @@ function startGame() {
 function showGameOverScreen(title, resultText) {
   gameRunning = false;
   document.getElementById('action-bar').classList.add('hidden');
+  document.getElementById('action-bar').classList.remove('mobile-paused');
   document.getElementById('go-title').textContent = title;
   document.getElementById('go-result').textContent = resultText;
   document.getElementById('go-score').textContent = score;
@@ -1574,11 +1596,13 @@ function togglePause() {
   if (!gameRunning) return;
   gamePaused = !gamePaused;
   document.getElementById('btn-pause').textContent = gamePaused ? '▶ Resume' : '⏸ Pause';
+  document.getElementById('action-bar').classList.toggle('mobile-paused', gamePaused && isMobile);
   if (!gamePaused) requestAnimationFrame(gameLoop);
   else drawPauseOverlay();
 }
 
 function restartGame() {
+  document.getElementById('action-bar').classList.remove('mobile-paused');
   gamePaused = false;
   gameRunning = false;
   startGame();
