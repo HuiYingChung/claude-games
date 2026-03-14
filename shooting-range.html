@@ -288,7 +288,11 @@ canvas { display: block; }
 }
 #mobileReloadBtn:active { background: #e94560; transform: scale(0.95); }
 #mobileReloadBtn.hidden { display: none; }
-#mobileReloadBtn.empty { border-color: #ff2222; background: rgba(255,34,34,0.4); animation: reloadPulse 0.8s ease-in-out infinite alternate; }
+#mobileReloadBtn.empty { border-color: #ff2222; background: rgba(255,34,34,0.4); animation: btnPulse 0.8s ease-in-out infinite alternate; }
+@keyframes btnPulse {
+  from { transform: scale(1); box-shadow: 0 0 8px rgba(255,34,34,0.3); }
+  to { transform: scale(1.06); box-shadow: 0 0 20px rgba(255,34,34,0.6); }
+}
 
 /* Mobile crosshair */
 #mobileCrosshair {
