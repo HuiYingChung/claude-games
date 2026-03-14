@@ -299,21 +299,26 @@ button:active { transform: translateY(0); }
     display: flex !important;
     position: fixed;
     left: 50%;
-    bottom: 198px;
+    bottom: 206px;
     transform: translateX(-50%);
     z-index: 40;
     flex-wrap: wrap;
-    width: min(92vw, 360px);
-    gap: 8px;
-    padding: 10px;
-    border-radius: 14px;
+    width: min(94vw, 392px);
+    gap: 10px;
+    padding: 12px;
+    border-radius: 16px;
     background: rgba(10,10,30,0.92);
     border: 1px solid rgba(255,107,53,0.28);
     box-shadow: 0 14px 36px rgba(0,0,0,0.35);
   }
   #action-bar.mobile-paused button {
-    flex: 1 1 44%;
-    min-width: 120px;
+    flex: 1 1 calc(50% - 6px);
+    min-width: 136px;
+    min-height: 50px;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    line-height: 1.1;
+    border-radius: 14px;
   }
   #mobileControls { display: block; }
   #mobileHud { display: flex; }
@@ -339,6 +344,18 @@ button:active { transform: translateY(0); }
   button { padding: 8px 24px; font-size: 0.85rem; }
 }
 @media (max-width: 480px) {
+  #action-bar.mobile-paused {
+    bottom: 184px;
+    width: min(95vw, 360px);
+    gap: 9px;
+    padding: 10px;
+  }
+  #action-bar.mobile-paused button {
+    min-width: 124px;
+    min-height: 48px;
+    padding: 11px 12px;
+    font-size: 0.9rem;
+  }
   .dpad { left: 10px; bottom: 8px; width: 170px; height: 170px; }
   .dpad-btn { width: 54px; height: 54px; font-size: 18px; }
   .dpad-up { left: 58px; top: 0; }
@@ -349,6 +366,17 @@ button:active { transform: translateY(0); }
   .mobile-pause { right: 110px; bottom: 48px; width: 38px; height: 38px; font-size: 14px; }
 }
 @media (max-height: 500px) and (orientation: landscape) {
+  #action-bar.mobile-paused {
+    bottom: 136px;
+    width: min(92vw, 340px);
+    gap: 8px;
+    padding: 8px;
+  }
+  #action-bar.mobile-paused button {
+    min-height: 42px;
+    padding: 9px 10px;
+    font-size: 0.82rem;
+  }
   #mobileHud { height: 28px; font-size: 0.6rem; }
   #mobileControls { height: 130px; }
   .dpad { width: 136px; height: 136px; bottom: 5px; left: 10px; }
