@@ -15,7 +15,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
   font-family: 'Noto Sans TC', 'Segoe UI', sans-serif;
   color: #fff;
   overflow: hidden;
@@ -26,6 +27,7 @@ body {
   display: flex;
   flex-direction: column;
   max-height: 100vh;
+  max-height: 100dvh;
   padding: 4px 0;
   touch-action: none;
   -webkit-touch-callout: none;
@@ -295,7 +297,20 @@ button:active { transform: translateY(0); }
   #action-bar { display: none !important; }
   #mobileControls { display: block; }
   #mobileHud { display: flex; }
-  html, body { overflow: hidden; position: fixed; width: 100%; height: 100%; }
+  html, body {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+  }
+  body {
+    position: relative;
+    align-items: flex-start;
+  }
+  #game-container {
+    max-height: none;
+    width: 651px;
+  }
   #start-screen, #game-over-screen {
     max-width: 90vw;
     padding: 18px 20px;
@@ -409,12 +424,14 @@ canvas.height = ROWS * TILE;
 // ===================== RESPONSIVE SCALING =====================
 function resizeGame() {
   const container = document.getElementById('game-container');
-  const vw = window.innerWidth;
-  const vh = window.innerHeight;
+  const viewport = window.visualViewport;
+  const vw = Math.round(viewport?.width || window.innerWidth || document.documentElement.clientWidth || 0);
+  const vh = Math.round(viewport?.height || window.innerHeight || document.documentElement.clientHeight || 0);
   const isMobileView = vw < 780;
-
-  const mobileHudH = isMobileView ? 36 : 0;
-  const mobileCtrlH = isMobileView ? 190 : 0;
+  const mobileHudEl = document.getElementById('mobileHud');
+  const mobileControlsEl = document.getElementById('mobileControls');
+  const mobileHudH = isMobileView ? (mobileHudEl?.offsetHeight || 36) : 0;
+  const mobileCtrlH = isMobileView ? (mobileControlsEl?.offsetHeight || 190) : 0;
 
   // Desktop: h1 + info-bar + action-bar + padding
   const desktopChromeH = isMobileView ? 0 :
@@ -425,7 +442,7 @@ function resizeGame() {
   const baseW = canvas.width + 6;
   const baseH = canvas.height + desktopChromeH + 6;
   const availW = vw;
-  const availH = vh - mobileHudH - mobileCtrlH;
+  const availH = Math.max(120, vh - mobileHudH - mobileCtrlH);
   const maxScale = isMobileView ? 1.5 : 1;
   const scale = Math.min(availW / baseW, availH / baseH, maxScale);
 
@@ -433,11 +450,12 @@ function resizeGame() {
     // Mobile: transform-scale the container, center it between HUD and controls
     const scaledW = baseW * scale;
     const scaledH = canvas.height * scale;
-    const left = (vw - scaledW) / 2;
-    const top = mobileHudH + Math.max(0, (availH - scaledH) * 0.3);
+    const left = Math.max(0, (vw - scaledW) / 2);
+    const top = Math.max(mobileHudH + 6, mobileHudH + Math.max(0, (availH - scaledH) * 0.3));
     container.style.position = 'fixed';
     container.style.left = '0';
     container.style.top = '0';
+    container.style.width = `${canvas.width}px`;
     container.style.transform = `translate(${left}px, ${top}px) scale(${scale})`;
     container.style.transformOrigin = 'top left';
     canvas.style.width = '';
@@ -448,6 +466,7 @@ function resizeGame() {
     container.style.position = '';
     container.style.left = '';
     container.style.top = '';
+    container.style.width = '';
     container.style.transform = '';
     container.style.transformOrigin = '';
     canvas.style.width = (canvas.width * scale) + 'px';
@@ -467,6 +486,8 @@ function updateMobileHud() {
 
 window.addEventListener('resize', resizeGame);
 window.addEventListener('orientationchange', () => setTimeout(resizeGame, 100));
+window.visualViewport?.addEventListener('resize', resizeGame);
+window.visualViewport?.addEventListener('scroll', resizeGame);
 resizeGame();
 
 // ===================== SOUND SYSTEM =====================
