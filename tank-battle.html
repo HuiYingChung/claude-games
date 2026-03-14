@@ -18,6 +18,17 @@ body {
 body.prelayout #gameContainer,
 body.prelayout #mobileHud,
 body.prelayout #mobileControls,
+body.prelayout #startScreen,
+body.prelayout #gameOverScreen,
+body.prelayout #pauseScreen,
+body.prelayout #soundToggle,
+body.reloading #gameContainer,
+body.reloading #mobileHud,
+body.reloading #mobileControls,
+body.reloading #startScreen,
+body.reloading #gameOverScreen,
+body.reloading #pauseScreen,
+body.reloading #soundToggle,
 body.prelayout #soundToggle {
   visibility: hidden;
 }
@@ -1897,6 +1908,8 @@ function updateMobileHud() {
 
 window.addEventListener('resize', resizeGame);
 window.addEventListener('orientationchange', () => setTimeout(resizeGame, 100));
+window.addEventListener('pagehide', () => document.body.classList.add('reloading'));
+window.addEventListener('beforeunload', () => document.body.classList.add('reloading'));
 resizeGame();
 </script>
 </body>
