@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(do)",
+      "Bash(sed -i 's|</body>|<script>window.si = window.si || function \\(\\) { \\(window.siq = window.siq || []\\).push\\(arguments\\); };</script>\\\\n<script defer src=\"\"/_vercel/speed-insights/script.js\"\"></script>\\\\n</body>|' \"$f\")",
+      "Bash(echo \"Updated: $f\")",
+      "Bash(python -c \":*)"
+    ]
+  }
+}
