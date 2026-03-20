@@ -6276,12 +6276,13 @@ function setFeedback(id, msg, type) {
 
 // ─── POINTS POPUP ───────────────────────────────────────────
 function showPointsPopup(x, y, pts, parentId) {
+  const scale = getMobileScale();
   const parent = document.getElementById(parentId) || document.getElementById('game-container');
   const popup = document.createElement('div');
   popup.className = 'pts-popup ' + (pts >= 0 ? 'good' : 'bad');
   popup.textContent = pts >= 0 ? `+${pts}` : `${pts}`;
-  popup.style.left = x + 'px';
-  popup.style.top  = y + 'px';
+  popup.style.left = (x / scale) + 'px';
+  popup.style.top  = (y / scale) + 'px';
   parent.appendChild(popup);
   setTimeout(() => popup.remove(), 950);
 }
@@ -6991,6 +6992,11 @@ let activeDrag = null;      // currently dragged element config
 let dragEl = null;          // DOM element
 let dragOffsetX = 0;
 let dragOffsetY = 0;
+
+function getMobileScale() {
+  const s = parseFloat(getComputedStyle(document.body).getPropertyValue('--mobile-game-scale'));
+  return (s && s > 0) ? s : 1;
+}
 let dragStartX = 0;
 let dragStartY = 0;
 
@@ -7013,14 +7019,15 @@ function startDrag(e, cfg, el) {
   activeDrag = cfg;
   dragEl = el;
 
+  const scale = getMobileScale();
   const area = document.getElementById(cfg.areaId);
   const areaRect = area.getBoundingClientRect();
   const elRect = el.getBoundingClientRect();
 
   dragOffsetX = e.clientX - elRect.left;
   dragOffsetY = e.clientY - elRect.top;
-  dragStartX = elRect.left - areaRect.left;
-  dragStartY = elRect.top - areaRect.top;
+  dragStartX = (elRect.left - areaRect.left) / scale;
+  dragStartY = (elRect.top - areaRect.top) / scale;
 
   el.classList.add('dragging');
   el.style.position = 'absolute';
@@ -7051,10 +7058,11 @@ function startDragTouch(e, cfg, el) {
 
 function onDragMove(e) {
   if (!dragEl || !activeDrag) return;
+  const scale = getMobileScale();
   const area = document.getElementById(activeDrag.areaId);
   const areaRect = area.getBoundingClientRect();
-  const x = e.clientX - areaRect.left - dragOffsetX;
-  const y = e.clientY - areaRect.top - dragOffsetY;
+  const x = (e.clientX - areaRect.left - dragOffsetX) / scale;
+  const y = (e.clientY - areaRect.top - dragOffsetY) / scale;
   dragEl.style.left = x + 'px';
   dragEl.style.top = y + 'px';
 }
@@ -7062,11 +7070,12 @@ function onDragMove(e) {
 function onDragMoveTouch(e) {
   e.preventDefault();
   if (!dragEl || !activeDrag) return;
+  const scale = getMobileScale();
   const touch = e.touches[0];
   const area = document.getElementById(activeDrag.areaId);
   const areaRect = area.getBoundingClientRect();
-  const x = touch.clientX - areaRect.left - dragOffsetX;
-  const y = touch.clientY - areaRect.top - dragOffsetY;
+  const x = (touch.clientX - areaRect.left - dragOffsetX) / scale;
+  const y = (touch.clientY - areaRect.top - dragOffsetY) / scale;
   dragEl.style.left = x + 'px';
   dragEl.style.top = y + 'px';
 }
@@ -7080,6 +7089,9 @@ function onDragEnd(e) {
 function onDragEndTouch(e) {
   document.removeEventListener('touchmove', onDragMoveTouch);
   document.removeEventListener('touchend', onDragEndTouch);
+  // Also remove mouse listeners added by startDrag (called from startDragTouch)
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('mouseup', onDragEnd);
   const touch = e.changedTouches[0];
   finalizeDrop(touch.clientX, touch.clientY);
 }
@@ -7104,6 +7116,7 @@ function finalizeDrop(clientX, clientY) {
 
   if (dropped) {
     // Snap into drop zone
+    const scale = getMobileScale();
     const area = document.getElementById(cfg.areaId);
     const areaRect = area.getBoundingClientRect();
     const dzRect = dropZone.getBoundingClientRect();
@@ -7123,8 +7136,8 @@ function finalizeDrop(clientX, clientY) {
       snapOffsetY = foodSlots[slot][1];
     }
 
-    dragEl.style.left = (dzRect.left - areaRect.left + snapOffsetX) + 'px';
-    dragEl.style.top  = (dzRect.top  - areaRect.top  + snapOffsetY) + 'px';
+    dragEl.style.left = ((dzRect.left - areaRect.left) / scale + snapOffsetX) + 'px';
+    dragEl.style.top  = ((dzRect.top  - areaRect.top)  / scale + snapOffsetY) + 'px';
     dragEl.style.right = '';
     dragEl.style.bottom = '';
     dragEl.style.border = '2px solid #6ab04c';
@@ -7245,7 +7258,7 @@ function updateMobileLayout() {
 
   const fittedScale = isLandscape
     ? (isSceneScreen
-        ? Math.min(viewportWidth / 800, 1)
+        ? Math.min(viewportWidth / 800, viewportHeight / 560, 1)
         : Math.min(viewportWidth / 800, viewportHeight / 560, 1))
     : Math.min(viewportWidth / 800, viewportHeight / 560, 1);
   const mobileScale = isMobileDevice ? Math.max(0.42, fittedScale) : 1;
@@ -7262,6 +7275,7 @@ function wirePrimaryButtons() {
     const el = document.querySelector(selector);
     if (!el || el.dataset.wired === 'true') return;
     el.dataset.wired = 'true';
+    el.removeAttribute('onclick');          // prevent double-fire
     el.addEventListener('click', handler);
   };
 
