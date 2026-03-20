@@ -7270,21 +7270,6 @@ function updateMobileLayout() {
   }
 }
 
-function wirePrimaryButtons() {
-  const bindClick = (selector, handler) => {
-    const el = document.querySelector(selector);
-    if (!el || el.dataset.wired === 'true') return;
-    el.dataset.wired = 'true';
-    el.removeAttribute('onclick');          // prevent double-fire
-    el.addEventListener('click', handler);
-  };
-
-  bindClick('.start-btns .btn-green', () => startGame());
-  bindClick('#continue-patrol-btn', () => continueFromHome());
-  bindClick('#story-screen button[onclick="goToMap()"]', () => goToMap());
-  bindClick('.story-btn-row .btn', () => goToMap());
-}
-
 // ============================================================
 //  INITIALIZE ON LOAD
 // ============================================================
@@ -7295,7 +7280,6 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 window.addEventListener('DOMContentLoaded', applyLanguage);
 window.addEventListener('DOMContentLoaded', updateMobileLayout);
-window.addEventListener('DOMContentLoaded', wirePrimaryButtons);
 window.addEventListener('resize', updateMobileLayout);
 window.addEventListener('orientationchange', () => setTimeout(updateMobileLayout, 120));
 if (window.visualViewport) {
