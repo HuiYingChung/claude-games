@@ -2115,17 +2115,31 @@ body.mobile-device {
   background:
     radial-gradient(circle at top, rgba(238,213,128,0.12), transparent 32%),
     linear-gradient(180deg, #142810 0%, #091108 100%);
+  display: block;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding:
+    max(env(safe-area-inset-top), 10px)
+    max(env(safe-area-inset-right), 10px)
+    max(env(safe-area-inset-bottom), 28px)
+    max(env(safe-area-inset-left), 10px);
+  -webkit-overflow-scrolling: touch;
 }
 body.mobile-device #game-container {
-  position: fixed;
-  top: 50%;
+  position: relative;
+  top: auto;
   left: 50%;
-  transform: translate(-50%, -50%) scale(var(--mobile-game-scale));
-  transform-origin: center center;
+  transform: translateX(-50%) scale(var(--mobile-game-scale));
+  transform-origin: top center;
+  margin: 0 0 48px;
   will-change: transform;
 }
 body.mobile-device.mobile-portrait #game-container {
   filter: blur(1px) saturate(0.85) brightness(0.8);
+}
+body.mobile-device.mobile-landscape {
+  min-height: calc(100dvh + 56px);
 }
 .mobile-rotate-overlay {
   position: fixed;
@@ -7156,12 +7170,15 @@ function updateMobileLayout() {
   const viewportHeight = Math.max(320, Math.round(vv ? vv.height : window.innerHeight));
   const isMobileDevice = window.matchMedia('(max-width: 900px) and (pointer: coarse)').matches;
   const isPortrait = viewportHeight > viewportWidth;
+  const isLandscape = isMobileDevice && !isPortrait;
 
   document.body.classList.toggle('mobile-device', isMobileDevice);
   document.body.classList.toggle('mobile-portrait', isMobileDevice && isPortrait);
-  document.body.classList.toggle('mobile-landscape', isMobileDevice && !isPortrait);
+  document.body.classList.toggle('mobile-landscape', isLandscape);
 
-  const fittedScale = Math.min(viewportWidth / 800, viewportHeight / 560, 1);
+  const fittedScale = isLandscape
+    ? Math.min(viewportWidth / 800, 1)
+    : Math.min(viewportWidth / 800, viewportHeight / 560, 1);
   const mobileScale = isMobileDevice ? Math.max(0.42, fittedScale) : 1;
   document.body.style.setProperty('--mobile-game-scale', mobileScale.toFixed(4));
 
