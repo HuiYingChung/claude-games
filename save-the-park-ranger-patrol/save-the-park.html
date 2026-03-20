@@ -2151,6 +2151,7 @@ body.mobile-device.mobile-landscape {
   background: rgba(4,12,5,0.84);
   backdrop-filter: blur(12px);
   z-index: 12000;
+  pointer-events: none;
 }
 .mobile-rotate-card {
   width: min(100%, 320px);
@@ -2181,6 +2182,7 @@ body.mobile-device.mobile-landscape {
 }
 body.mobile-device.mobile-portrait .mobile-rotate-overlay {
   display: flex;
+  pointer-events: auto;
 }
 @media (max-width: 900px) and (pointer: coarse) and (orientation: landscape) {
   #hud {
@@ -7188,6 +7190,20 @@ function updateMobileLayout() {
   }
 }
 
+function wirePrimaryButtons() {
+  const bindClick = (selector, handler) => {
+    const el = document.querySelector(selector);
+    if (!el || el.dataset.wired === 'true') return;
+    el.dataset.wired = 'true';
+    el.addEventListener('click', handler);
+  };
+
+  bindClick('.start-btns .btn-green', () => startGame());
+  bindClick('#continue-patrol-btn', () => continueFromHome());
+  bindClick('#story-screen button[onclick="goToMap()"]', () => goToMap());
+  bindClick('.story-btn-row .btn', () => goToMap());
+}
+
 // ============================================================
 //  INITIALIZE ON LOAD
 // ============================================================
@@ -7198,6 +7214,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 window.addEventListener('DOMContentLoaded', applyLanguage);
 window.addEventListener('DOMContentLoaded', updateMobileLayout);
+window.addEventListener('DOMContentLoaded', wirePrimaryButtons);
 window.addEventListener('resize', updateMobileLayout);
 window.addEventListener('orientationchange', () => setTimeout(updateMobileLayout, 120));
 if (window.visualViewport) {
