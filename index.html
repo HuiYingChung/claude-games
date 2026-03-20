@@ -178,6 +178,27 @@ body::before {
   border-radius: 4px;
 }
 
+.cabinet-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cabinet-badge {
+  padding: 4px 8px;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.yellowstone .cabinet-badge {
+  color: var(--color-yellowstone);
+  background: rgba(154, 203, 66, 0.12);
+}
+
 .screen {
   height: 160px;
   margin-bottom: 24px;
@@ -307,27 +328,30 @@ body::before {
   </section>
 
   <section class="card-grid">
-    <article class="cabinet tank">
+    <article class="cabinet yellowstone">
       <div class="cabinet-top">
-        <div class="cabinet-label" data-i18n="tank.label">Cabinet 01 / Defense</div>
-        <div class="cabinet-score" data-i18n="tank.score">1P Ready</div>
+        <div class="cabinet-meta">
+          <div class="cabinet-label" data-i18n="yellowstone.label">Cabinet 01 / Nature Quest</div>
+          <div class="cabinet-badge" data-i18n="yellowstone.badge">Original</div>
+        </div>
+        <div class="cabinet-score" data-i18n="yellowstone.score">Patrol Ready</div>
       </div>
       <div class="screen">
-        <img src="images/tank-battle-thumb.JPG" alt="Tank Battle Preview" loading="lazy">
+        <img src="images/yellowstone-thumb.JPG" alt="Yellowstone Ranger Patrol Preview" loading="lazy">
       </div>
-      <h2 data-i18n="tank.title">Tank Battle</h2>
-      <p data-i18n="tank.body">A retro tank defense challenge where you protect the base, wipe out enemy units, and push through tougher stages.</p>
+      <h2 data-i18n="yellowstone.title">Yellowstone Ranger Patrol</h2>
+      <p data-i18n="yellowstone.body">Patrol Yellowstone's key zones, solve visitor safety problems, and protect wildlife in a light adventure built around park ranger missions.</p>
       <div class="meta">
-        <span data-i18n="tank.tag1">Battle City Style</span>
-        <span data-i18n="tank.tag2">Real-Time Dodging</span>
-        <span data-i18n="tank.tag3">Stage Progression</span>
+        <span data-i18n="yellowstone.tag1">National Park Theme</span>
+        <span data-i18n="yellowstone.tag2">Mini Mission Zones</span>
+        <span data-i18n="yellowstone.tag3">Wildlife Protection</span>
       </div>
-      <a class="launch" href="tank-battle.html" data-i18n="tank.cta">Start Mission</a>
+      <a class="launch" href="save-the-park-ranger-patrol/save-the-park.html" data-i18n="yellowstone.cta">Begin Patrol</a>
     </article>
 
     <article class="cabinet range">
       <div class="cabinet-top">
-        <div class="cabinet-label" data-i18n="range.label">Station 02 / 3D Shooter</div>
+        <div class="cabinet-label" data-i18n="range.label">Cabinet 02 / Precision</div>
         <div class="cabinet-score" data-i18n="range.score">Target Locked</div>
       </div>
       <div class="screen">
@@ -379,22 +403,22 @@ body::before {
       <a class="launch" href="houston-monopoly.html" data-i18n="monopoly.cta">Play Round</a>
     </article>
 
-    <article class="cabinet yellowstone">
+    <article class="cabinet tank">
       <div class="cabinet-top">
-        <div class="cabinet-label" data-i18n="yellowstone.label">Cabinet 05 / Nature Quest</div>
-        <div class="cabinet-score" data-i18n="yellowstone.score">Patrol Ready</div>
+        <div class="cabinet-label" data-i18n="tank.label">Cabinet 05 / Defense</div>
+        <div class="cabinet-score" data-i18n="tank.score">1P Ready</div>
       </div>
       <div class="screen">
-        <img src="images/yellowstone-thumb.JPG" alt="Yellowstone Ranger Patrol Preview" loading="lazy">
+        <img src="images/tank-battle-thumb.JPG" alt="Tank Battle Preview" loading="lazy">
       </div>
-      <h2 data-i18n="yellowstone.title">Yellowstone Ranger Patrol</h2>
-      <p data-i18n="yellowstone.body">Patrol Yellowstone's key zones, solve visitor safety problems, and protect wildlife in a light adventure built around park ranger missions.</p>
+      <h2 data-i18n="tank.title">Tank Battle</h2>
+      <p data-i18n="tank.body">A retro tank defense challenge where you protect the base, wipe out enemy units, and push through tougher stages.</p>
       <div class="meta">
-        <span data-i18n="yellowstone.tag1">National Park Theme</span>
-        <span data-i18n="yellowstone.tag2">Mini Mission Zones</span>
-        <span data-i18n="yellowstone.tag3">Wildlife Protection</span>
+        <span data-i18n="tank.tag1">Battle City Style</span>
+        <span data-i18n="tank.tag2">Real-Time Dodging</span>
+        <span data-i18n="tank.tag3">Stage Progression</span>
       </div>
-      <a class="launch" href="save-the-park-ranger-patrol/save-the-park.html" data-i18n="yellowstone.cta">Begin Patrol</a>
+      <a class="launch" href="tank-battle.html" data-i18n="tank.cta">Start Mission</a>
     </article>
   </section>
 
@@ -414,7 +438,7 @@ const translations = {
       chip3: 'More coming soon'
     },
     tank: {
-      label: 'Cabinet 01 / Defense',
+      label: 'Cabinet 05 / Defense',
       score: '1P Ready',
       title: 'Tank Battle',
       body: 'A retro tank defense challenge where you protect the base, wipe out enemy units, and push through tougher stages.',
@@ -454,7 +478,8 @@ const translations = {
       cta: 'Play Round'
     },
     yellowstone: {
-      label: 'Cabinet 05 / Nature Quest',
+      label: 'Cabinet 01 / Nature Quest',
+      badge: 'Original',
       score: 'Patrol Ready',
       title: 'Yellowstone Ranger Patrol',
       body: "Patrol Yellowstone's key zones, solve visitor safety problems, and protect wildlife in a light adventure built around park ranger missions.",
@@ -479,7 +504,7 @@ const translations = {
       chip3: '之後還會增加'
     },
     tank: {
-      label: '01 號機 / 防守戰',
+      label: '05 號機 / 防守戰',
       score: '1P 準備中',
       title: '坦克大戰',
       body: '復古戰車防守玩法，守住基地、清掉敵軍，並一路推進到更困難的關卡。',
@@ -519,7 +544,8 @@ const translations = {
       cta: '開始一局'
     },
     yellowstone: {
-      label: '\u0030\u0035 \u865f\u6a5f / \u81ea\u7136\u5de1\u8b77',
+      label: '\u0030\u0031 \u865f\u6a5f / \u81ea\u7136\u5de1\u8b77',
+      badge: '\u539f\u5275',
       score: '\u5de1\u908f\u5c31\u7dd2',
       title: '\u9ec3\u77f3\u516c\u5712\u5de1\u8b77',
       body: '\u5de1\u8996\u9ec3\u77f3\u516c\u5712\u7684\u91cd\u8981\u5340\u57df\uff0c\u89e3\u6c7a\u904a\u5ba2\u5b89\u5168\u554f\u984c\uff0c\u4e26\u5728\u8f15\u9b06\u5192\u96aa\u4e2d\u4fdd\u8b77\u91ce\u751f\u52d5\u7269\u3002',

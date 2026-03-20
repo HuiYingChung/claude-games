@@ -16,6 +16,7 @@ body {
   align-items: center;
   min-height: 100vh;
   overflow: hidden;
+  --mobile-game-scale: 1;
 }
 
 /* ===== GAME CONTAINER ===== */
@@ -2110,6 +2111,137 @@ body {
   }
 }
 
+body.mobile-device {
+  background:
+    radial-gradient(circle at top, rgba(238,213,128,0.12), transparent 32%),
+    linear-gradient(180deg, #142810 0%, #091108 100%);
+}
+body.mobile-device #game-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(var(--mobile-game-scale));
+  transform-origin: center center;
+  will-change: transform;
+}
+body.mobile-device.mobile-portrait #game-container {
+  filter: blur(1px) saturate(0.85) brightness(0.8);
+}
+.mobile-rotate-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(4,12,5,0.84);
+  backdrop-filter: blur(12px);
+  z-index: 12000;
+}
+.mobile-rotate-card {
+  width: min(100%, 320px);
+  padding: 24px 20px;
+  border-radius: 24px;
+  border: 1px solid rgba(240,208,96,0.3);
+  background: linear-gradient(180deg, rgba(20,42,16,0.97), rgba(8,18,8,0.97));
+  box-shadow: 0 20px 48px rgba(0,0,0,0.36);
+  text-align: center;
+}
+.mobile-rotate-icon {
+  font-size: 40px;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+.mobile-rotate-title {
+  color: #f0d060;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  font-family: 'Cinzel', serif;
+}
+.mobile-rotate-text {
+  color: #d8efb0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+body.mobile-device.mobile-portrait .mobile-rotate-overlay {
+  display: flex;
+}
+@media (max-width: 900px) and (pointer: coarse) and (orientation: landscape) {
+  #hud {
+    height: 40px;
+    padding: 0 10px;
+    gap: 10px;
+  }
+  #hud .hud-label {
+    font-size: 9px;
+    letter-spacing: 0.7px;
+  }
+  #hud .hud-val {
+    font-size: 12px;
+  }
+  #hud-scene-name {
+    font-size: 10px;
+  }
+  #hud-pause-btn {
+    margin-left: 6px;
+    font-size: 13px;
+    padding: 1px 6px;
+  }
+  #lang-toggle-btn,
+  #exit-game-btn {
+    bottom: 10px;
+    font-size: 10px;
+    padding: 5px 9px;
+  }
+  .scene-footer {
+    min-height: 146px;
+    padding: 8px 10px;
+    gap: 8px;
+    grid-template-columns: minmax(0, 1fr) 280px 140px;
+  }
+  .task-item,
+  .choice-question,
+  .feedback-box {
+    font-size: 11px;
+  }
+  .choice-title {
+    font-size: 12px;
+  }
+  .choice-options button,
+  .scene-ctrl-btn,
+  .btn-complete-scene {
+    min-height: 32px;
+    font-size: 11px;
+  }
+  .map-title {
+    font-size: 20px;
+  }
+  .map-subtitle,
+  .map-health-label,
+  .map-stat-label {
+    font-size: 10px;
+  }
+  .map-stats {
+    gap: 14px;
+    margin-bottom: 10px;
+    padding: 8px 16px;
+  }
+  .map-health-wrap {
+    margin-bottom: 12px;
+    padding: 8px 12px 10px;
+  }
+  .badges-row {
+    margin-top: 10px;
+    gap: 7px;
+  }
+  .badge-chip {
+    font-size: 10px;
+    padding: 4px 9px;
+  }
+}
+
 /* ===== PAUSE SYSTEM ===== */
 #pause-overlay {
   position: absolute;
@@ -4027,6 +4159,14 @@ body {
     </div>
   </div>
 
+</div>
+
+<div class="mobile-rotate-overlay" id="mobile-rotate-overlay" aria-hidden="true">
+  <div class="mobile-rotate-card">
+    <div class="mobile-rotate-icon">📱↻</div>
+    <div class="mobile-rotate-title">Rotate Your Phone</div>
+    <div class="mobile-rotate-text">This game works best on mobile in landscape mode. Turn your phone sideways to keep the full park visible.</div>
+  </div>
 </div>
 
 
@@ -7010,6 +7150,27 @@ function pauseGoToStart() {
   showScreen('start-screen');
 }
 
+function updateMobileLayout() {
+  const vv = window.visualViewport;
+  const viewportWidth = Math.max(320, Math.round(vv ? vv.width : window.innerWidth));
+  const viewportHeight = Math.max(320, Math.round(vv ? vv.height : window.innerHeight));
+  const isMobileDevice = window.matchMedia('(max-width: 900px) and (pointer: coarse)').matches;
+  const isPortrait = viewportHeight > viewportWidth;
+
+  document.body.classList.toggle('mobile-device', isMobileDevice);
+  document.body.classList.toggle('mobile-portrait', isMobileDevice && isPortrait);
+  document.body.classList.toggle('mobile-landscape', isMobileDevice && !isPortrait);
+
+  const fittedScale = Math.min(viewportWidth / 800, viewportHeight / 560, 1);
+  const mobileScale = isMobileDevice ? Math.max(0.42, fittedScale) : 1;
+  document.body.style.setProperty('--mobile-game-scale', mobileScale.toFixed(4));
+
+  const rotateOverlay = document.getElementById('mobile-rotate-overlay');
+  if (rotateOverlay) {
+    rotateOverlay.setAttribute('aria-hidden', String(!(isMobileDevice && isPortrait)));
+  }
+}
+
 // ============================================================
 //  INITIALIZE ON LOAD
 // ============================================================
@@ -7019,5 +7180,11 @@ window.addEventListener('DOMContentLoaded', () => {
   console.log('🏕️ Save the Park: Yellowstone Ranger Patrol loaded!');
 });
 window.addEventListener('DOMContentLoaded', applyLanguage);
+window.addEventListener('DOMContentLoaded', updateMobileLayout);
+window.addEventListener('resize', updateMobileLayout);
+window.addEventListener('orientationchange', () => setTimeout(updateMobileLayout, 120));
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', updateMobileLayout);
+}
 </script></body></html>
 
