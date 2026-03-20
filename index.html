@@ -19,6 +19,7 @@
   --color-range: #f44336;
   --color-bomber: #ff8c00;
   --color-monopoly: #36c978;
+  --color-yellowstone: #9acb42;
 }
 
 * {
@@ -153,6 +154,7 @@ body::before {
 .cabinet.range:hover { border-color: var(--color-range); }
 .cabinet.bomber:hover { border-color: var(--color-bomber); }
 .cabinet.monopoly:hover { border-color: var(--color-monopoly); }
+.cabinet.yellowstone:hover { border-color: var(--color-yellowstone); }
 
 .cabinet-top {
   display: flex;
@@ -262,6 +264,7 @@ body::before {
 .tank .launch:hover { background: var(--color-tank); color: #000; border-color: var(--color-tank); }
 .range .launch:hover { background: var(--color-range); color: #fff; border-color: var(--color-range); }
 .bomber .launch:hover { background: var(--color-bomber); color: #000; border-color: var(--color-bomber); }
+.yellowstone .launch:hover { background: var(--color-yellowstone); color: #132400; border-color: var(--color-yellowstone); }
 
 .footer-note {
   text-align: center;
@@ -375,6 +378,24 @@ body::before {
       </div>
       <a class="launch" href="houston-monopoly.html" data-i18n="monopoly.cta">Play Round</a>
     </article>
+
+    <article class="cabinet yellowstone">
+      <div class="cabinet-top">
+        <div class="cabinet-label" data-i18n="yellowstone.label">Cabinet 05 / Nature Quest</div>
+        <div class="cabinet-score" data-i18n="yellowstone.score">Patrol Ready</div>
+      </div>
+      <div class="screen">
+        <img src="images/yellowstone-thumb.JPG" alt="Yellowstone Ranger Patrol Preview" loading="lazy">
+      </div>
+      <h2 data-i18n="yellowstone.title">Yellowstone Ranger Patrol</h2>
+      <p data-i18n="yellowstone.body">Patrol Yellowstone's key zones, solve visitor safety problems, and protect wildlife in a light adventure built around park ranger missions.</p>
+      <div class="meta">
+        <span data-i18n="yellowstone.tag1">National Park Theme</span>
+        <span data-i18n="yellowstone.tag2">Mini Mission Zones</span>
+        <span data-i18n="yellowstone.tag3">Wildlife Protection</span>
+      </div>
+      <a class="launch" href="save-the-park-ranger-patrol/save-the-park.html" data-i18n="yellowstone.cta">Begin Patrol</a>
+    </article>
   </section>
 
   <div class="footer-note" data-i18n="footer.note">© 2026 Huiying Chung. Created in collaboration with AI.</div>
@@ -432,6 +453,16 @@ const translations = {
       tag3: 'Hotseat Strategy',
       cta: 'Play Round'
     },
+    yellowstone: {
+      label: 'Cabinet 05 / Nature Quest',
+      score: 'Patrol Ready',
+      title: 'Yellowstone Ranger Patrol',
+      body: "Patrol Yellowstone's key zones, solve visitor safety problems, and protect wildlife in a light adventure built around park ranger missions.",
+      tag1: 'National Park Theme',
+      tag2: 'Mini Mission Zones',
+      tag3: 'Wildlife Protection',
+      cta: 'Begin Patrol'
+    },
     footer: {
       note: '© 2026 Huiying Chung. Created in collaboration with AI.'
     }
@@ -486,6 +517,16 @@ const translations = {
       tag2: '機會卡變化',
       tag3: '同螢幕策略對戰',
       cta: '開始一局'
+    },
+    yellowstone: {
+      label: '\u0030\u0035 \u865f\u6a5f / \u81ea\u7136\u5de1\u8b77',
+      score: '\u5de1\u908f\u5c31\u7dd2',
+      title: '\u9ec3\u77f3\u516c\u5712\u5de1\u8b77',
+      body: '\u5de1\u8996\u9ec3\u77f3\u516c\u5712\u7684\u91cd\u8981\u5340\u57df\uff0c\u89e3\u6c7a\u904a\u5ba2\u5b89\u5168\u554f\u984c\uff0c\u4e26\u5728\u8f15\u9b06\u5192\u96aa\u4e2d\u4fdd\u8b77\u91ce\u751f\u52d5\u7269\u3002',
+      tag1: '\u570b\u5bb6\u516c\u5712\u4e3b\u984c',
+      tag2: '\u5206\u5340\u5c0f\u4efb\u52d9',
+      tag3: '\u91ce\u751f\u52d5\u7269\u4fdd\u8b77',
+      cta: '\u958b\u59cb\u5de1\u908f'
     },
     footer: {
       note: '© 2026 Huiying Chung。與 AI 協作製作。'
