@@ -2259,6 +2259,7 @@ body.mobile-device.mobile-portrait .mobile-rotate-overlay {
   #briefing-screen {
     justify-content: flex-start;
     align-items: stretch;
+    height: 100%;
     overflow-y: auto;
     padding: 18px 18px 28px;
     -webkit-overflow-scrolling: touch;
@@ -5100,6 +5101,7 @@ function showScreen(id) {
   } else {
     hud.classList.remove('visible');
   }
+  updateMobileLayout();
 }
 
 // ─── HUD UPDATE ─────────────────────────────────────────────
@@ -7233,13 +7235,18 @@ function updateMobileLayout() {
   const isMobileDevice = window.matchMedia('(max-width: 900px) and (pointer: coarse)').matches;
   const isPortrait = viewportHeight > viewportWidth;
   const isLandscape = isMobileDevice && !isPortrait;
+  const activeScreen = document.querySelector('.screen.active');
+  const activeScreenId = activeScreen ? activeScreen.id : '';
+  const isSceneScreen = ['geyser-screen','bison-screen','camp-screen','trail-screen','lake-screen'].includes(activeScreenId);
 
   document.body.classList.toggle('mobile-device', isMobileDevice);
   document.body.classList.toggle('mobile-portrait', isMobileDevice && isPortrait);
   document.body.classList.toggle('mobile-landscape', isLandscape);
 
   const fittedScale = isLandscape
-    ? Math.min(viewportWidth / 800, 1)
+    ? (isSceneScreen
+        ? Math.min(viewportWidth / 800, 1)
+        : Math.min(viewportWidth / 800, viewportHeight / 560, 1))
     : Math.min(viewportWidth / 800, viewportHeight / 560, 1);
   const mobileScale = isMobileDevice ? Math.max(0.42, fittedScale) : 1;
   document.body.style.setProperty('--mobile-game-scale', mobileScale.toFixed(4));
