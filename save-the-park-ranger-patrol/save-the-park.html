@@ -7394,7 +7394,7 @@ const AudioEngine = (() => {
       masterGain.connect(ctx.destination);
 
       musicGain = ctx.createGain();
-      musicGain.gain.value = 0.35;
+      musicGain.gain.value = 0.25;
       musicGain.connect(masterGain);
 
       sfxGain = ctx.createGain();
@@ -7698,18 +7698,24 @@ const AudioEngine = (() => {
           osc.type = waveType || 'sine';
           osc.frequency.value = freq;
           gain.gain.setValueAtTime(0, barStart);
-          gain.gain.linearRampToValueAtTime(0.12, barStart + 0.15);
-          gain.gain.setValueAtTime(0.1, barStart + 3.5 * beatDur);
+          gain.gain.linearRampToValueAtTime(0.08, barStart + 0.15);
+          gain.gain.setValueAtTime(0.06, barStart + 3.5 * beatDur);
           gain.gain.linearRampToValueAtTime(0, barStart + 4 * beatDur);
+
+          // Always add a highpass to remove rumble
+          const hpf = ctx.createBiquadFilter();
+          hpf.type = 'highpass';
+          hpf.frequency.value = 200;
+          osc.connect(hpf);
 
           if (filterFreq) {
             const flt = ctx.createBiquadFilter();
             flt.type = 'lowpass';
             flt.frequency.value = filterFreq;
-            osc.connect(flt);
+            hpf.connect(flt);
             flt.connect(gain);
           } else {
-            osc.connect(gain);
+            hpf.connect(gain);
           }
           gain.connect(musicGain);
           osc.start(barStart);
@@ -7721,7 +7727,7 @@ const AudioEngine = (() => {
             const arpOsc = ctx.createOscillator();
             const arpGain = ctx.createGain();
             arpOsc.type = 'triangle';
-            arpOsc.frequency.value = freq * 2;
+            arpOsc.frequency.value = freq * 1.5;
             const arpTime = barStart + ni * beatDur * 0.8;
             arpGain.gain.setValueAtTime(0, arpTime);
             arpGain.gain.linearRampToValueAtTime(0.06, arpTime + 0.05);
@@ -7742,58 +7748,58 @@ const AudioEngine = (() => {
     scheduleLoop();
   }
 
-  // Music presets
+  // Music presets — light and airy, octave 4–5 range
   function musicTitle() {
-    // Peaceful C major: C-Am-F-G
+    // Peaceful C major: C-Am-F-G (high register, gentle)
     playChordLoop([
-      [NOTE.C4, NOTE.E4, NOTE.G4],
-      [NOTE.A3, NOTE.C4, NOTE.E4],
-      [NOTE.F3, NOTE.A3, NOTE.C4],
-      [NOTE.G3, NOTE.B3, NOTE.D4]
-    ], 55, 'sine', 600);
+      [NOTE.C5, NOTE.E5, NOTE.G5],
+      [NOTE.A4, NOTE.C5, NOTE.E5],
+      [NOTE.F4, NOTE.A4, NOTE.C5],
+      [NOTE.G4, NOTE.B4, NOTE.D5]
+    ], 55, 'triangle', 1800);
   }
 
   function musicStory() {
-    // Atmospheric building: Dm-Am-Bb-C
+    // Atmospheric: Dm-Am-Bb-C (mid-high, ethereal)
     playChordLoop([
-      [NOTE.D3, NOTE.F3, NOTE.A3],
-      [NOTE.A3, NOTE.C4, NOTE.E4],
-      [233.08, NOTE.D4, NOTE.F4], // Bb3
-      [NOTE.C4, NOTE.E4, NOTE.G4]
-    ], 50, 'sine', 500);
+      [NOTE.D4, NOTE.F4, NOTE.A4],
+      [NOTE.A4, NOTE.C5, NOTE.E5],
+      [466.16, NOTE.D5, NOTE.F5], // Bb4
+      [NOTE.C5, NOTE.E5, NOTE.G5]
+    ], 50, 'triangle', 1500);
   }
 
   function musicMap() {
-    // Adventure: G-Em-C-D
+    // Adventure: G-Em-C-D (bright, uplifting)
     playChordLoop([
-      [NOTE.G3, NOTE.B3, NOTE.D4],
-      [NOTE.E3, NOTE.G3, NOTE.B3],
-      [NOTE.C4, NOTE.E4, NOTE.G4],
-      [NOTE.D4, NOTE.F4+17, NOTE.A4] // F#4 ≈ 370
-    ], 65, 'triangle', 800);
+      [NOTE.G4, NOTE.B4, NOTE.D5],
+      [NOTE.E4, NOTE.G4, NOTE.B4],
+      [NOTE.C5, NOTE.E5, NOTE.G5],
+      [NOTE.D5, 370, NOTE.A5]
+    ], 65, 'triangle', 2000);
   }
 
   function musicScene(scene) {
     const themes = {
-      geyser: { // Mysterious D minor
-        chords: [[NOTE.D3,NOTE.F3,NOTE.A3],[NOTE.A3,NOTE.C4,NOTE.E4],[233.08,NOTE.D4,NOTE.F4],[NOTE.C4,NOTE.E4,NOTE.G4]],
-        tempo: 60, wave: 'sine', filter: 550
+      geyser: { // Mysterious D minor (mid register)
+        chords: [[NOTE.D4,NOTE.F4,NOTE.A4],[NOTE.A4,NOTE.C5,NOTE.E5],[466.16,NOTE.D5,NOTE.F5],[NOTE.C5,NOTE.E5,NOTE.G5]],
+        tempo: 60, wave: 'triangle', filter: 1600
       },
       bison: { // Open E minor
-        chords: [[NOTE.E3,NOTE.G3,NOTE.B3],[NOTE.C4,NOTE.E4,NOTE.G4],[NOTE.D4,NOTE.F4+17,NOTE.A4],[NOTE.E3,NOTE.G3,NOTE.B3]],
-        tempo: 58, wave: 'triangle', filter: 650
+        chords: [[NOTE.E4,NOTE.G4,NOTE.B4],[NOTE.C5,NOTE.E5,NOTE.G5],[NOTE.D5,370,NOTE.A5],[NOTE.E4,NOTE.G4,NOTE.B4]],
+        tempo: 58, wave: 'triangle', filter: 1800
       },
       camp: { // Warm A minor
-        chords: [[NOTE.A3,NOTE.C4,NOTE.E4],[NOTE.F3,NOTE.A3,NOTE.C4],[NOTE.G3,NOTE.B3,NOTE.D4],[NOTE.E3,NOTE.G3,NOTE.B3]],
-        tempo: 55, wave: 'sine', filter: 700
+        chords: [[NOTE.A4,NOTE.C5,NOTE.E5],[NOTE.F4,NOTE.A4,NOTE.C5],[NOTE.G4,NOTE.B4,NOTE.D5],[NOTE.E4,NOTE.G4,NOTE.B4]],
+        tempo: 55, wave: 'triangle', filter: 1900
       },
-      trail: { // Mysterious B minor
-        chords: [[NOTE.B3,NOTE.D4,NOTE.F4+17],[NOTE.G3,NOTE.B3,NOTE.D4],[NOTE.A3,NOTE.C4+17,NOTE.E4],[NOTE.F3+17,NOTE.A3,NOTE.C4+17]],
-        tempo: 52, wave: 'sine', filter: 500
+      trail: { // Forest B minor
+        chords: [[NOTE.B4,NOTE.D5,370],[NOTE.G4,NOTE.B4,NOTE.D5],[NOTE.A4,277.18,NOTE.E5],[370,NOTE.A4,277.18]],
+        tempo: 52, wave: 'triangle', filter: 1500
       },
-      lake: { // Flowing F# minor / gentle
-        chords: [[NOTE.F3+17,NOTE.A3,NOTE.C4+17],[NOTE.D4,NOTE.F4+17,NOTE.A4],[NOTE.E4,NOTE.G4+12,NOTE.B4],[NOTE.C4+17,NOTE.E4,NOTE.G4+12]],
-        tempo: 50, wave: 'sine', filter: 550
+      lake: { // Flowing, gentle
+        chords: [[370,NOTE.A4,277.18],[NOTE.D5,370,NOTE.A5],[NOTE.E5,NOTE.G5,NOTE.B5],[277.18,NOTE.E5,NOTE.G5]],
+        tempo: 50, wave: 'sine', filter: 1600
       }
     };
     const t = themes[scene] || themes.geyser;
@@ -7801,32 +7807,32 @@ const AudioEngine = (() => {
   }
 
   function musicBriefing() {
-    // Urgent, pulsing
+    // Urgent, pulsing (higher register, less heavy)
     playChordLoop([
-      [NOTE.D3, NOTE.A3],
-      [NOTE.D3, NOTE.F3],
-      [NOTE.C3, NOTE.G3],
-      [NOTE.C3, NOTE.E3]
-    ], 80, 'square', 400);
+      [NOTE.D4, NOTE.A4],
+      [NOTE.D4, NOTE.F4],
+      [NOTE.C4, NOTE.G4],
+      [NOTE.C4, NOTE.E4]
+    ], 80, 'triangle', 1200);
   }
 
   function musicResults(score) {
     if (score >= 70) {
-      // Triumphant C major
+      // Triumphant C major (bright)
       playChordLoop([
-        [NOTE.C4, NOTE.E4, NOTE.G4],
-        [NOTE.F3, NOTE.A3, NOTE.C4],
-        [NOTE.G3, NOTE.B3, NOTE.D4],
-        [NOTE.C4, NOTE.E4, NOTE.G4]
-      ], 70, 'sine', 900);
+        [NOTE.C5, NOTE.E5, NOTE.G5],
+        [NOTE.F4, NOTE.A4, NOTE.C5],
+        [NOTE.G4, NOTE.B4, NOTE.D5],
+        [NOTE.C5, NOTE.E5, NOTE.G5]
+      ], 70, 'triangle', 2200);
     } else {
-      // Reflective A minor
+      // Reflective A minor (gentle)
       playChordLoop([
-        [NOTE.A3, NOTE.C4, NOTE.E4],
-        [NOTE.D3, NOTE.F3, NOTE.A3],
-        [NOTE.E3, NOTE.G3, NOTE.B3],
-        [NOTE.A3, NOTE.C4, NOTE.E4]
-      ], 48, 'sine', 500);
+        [NOTE.A4, NOTE.C5, NOTE.E5],
+        [NOTE.D4, NOTE.F4, NOTE.A4],
+        [NOTE.E4, NOTE.G4, NOTE.B4],
+        [NOTE.A4, NOTE.C5, NOTE.E5]
+      ], 48, 'triangle', 1400);
     }
   }
 
