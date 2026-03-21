@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Save the Park: Yellowstone Ranger Patrol</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap');
@@ -15,6 +15,8 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   overflow: hidden;
   --mobile-game-scale: 1;
 }
@@ -25,6 +27,7 @@ body {
   height: 560px;
   position: relative;
   overflow: hidden;
+  touch-action: manipulation;
   border-radius: 12px;
   box-shadow: 0 0 0 1px rgba(100,160,50,0.2), 0 8px 40px rgba(0,0,0,0.8), 0 0 80px rgba(30,80,10,0.3);
 }
@@ -619,8 +622,10 @@ body {
 #story-screen {
   background: #07090f;
   flex-direction: column;
-  align-items: center; justify-content: center;
+  align-items: center; justify-content: flex-start;
   padding: 32px 52px; gap: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .story-header {
   font-size: 11px; font-weight: 800; letter-spacing: 3px;
@@ -652,6 +657,10 @@ body {
 .story-btn-row {
   margin-top: 22px; display: flex; gap: 14px;
   opacity: 0; animation: storyBeatIn 0.5s ease forwards; animation-delay: 2.8s;
+  touch-action: manipulation;
+}
+.story-btn-row .btn {
+  touch-action: manipulation;
 }
 @keyframes storyBeatIn {
   from { opacity: 0; transform: translateY(7px); }
@@ -2655,7 +2664,7 @@ body.mobile-device.mobile-portrait .mobile-rotate-overlay {
     <button id="story-skip-btn" onclick="goToMap()" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.06);color:#666;font-size:12px;padding:6px 14px;border:1px solid #333;border-radius:6px;cursor:pointer;letter-spacing:0.5px;">Skip ›</button>
 
     <div class="story-btn-row">
-      <button class="btn btn-green" onclick="goToMap()" style="font-size:15px;padding:12px 30px;">&#9889; Begin Patrol</button>
+      <button id="story-begin-btn" class="btn btn-green" onclick="goToMap()" style="font-size:15px;padding:12px 30px;">&#9889; Begin Patrol</button>
     </div>
   </div>
 
@@ -4748,7 +4757,12 @@ function toggleLanguage() {
   } catch (err) {
     // Ignore storage errors in file:// or privacy-restricted contexts.
   }
+  // Save scroll positions of scrollable screens before language swap
+  const storyScreen = document.getElementById('story-screen');
+  const savedStoryScroll = storyScreen ? storyScreen.scrollTop : 0;
   applyLanguage();
+  // Restore scroll positions after language content changes
+  if (storyScreen) storyScreen.scrollTop = savedStoryScroll;
 }
 
 function applyLanguage() {
@@ -4777,7 +4791,7 @@ function applyLanguage() {
     if (storyQuotes[1]) storyQuotes[1].innerHTML = copy.storyBeat4Quote;
     const skipBtn = document.getElementById('story-skip-btn');
     if (skipBtn) skipBtn.textContent = copy.storySkip;
-    const storyBeginBtn = document.querySelector('.story-btn-row .btn');
+    const storyBeginBtn = document.getElementById('story-begin-btn');
     if (storyBeginBtn) storyBeginBtn.textContent = copy.storyBegin;
 
     const briefingHeader = document.querySelector('#briefing-screen .briefing-header');
@@ -7277,12 +7291,17 @@ function wirePrimaryButtons() {
     el.dataset.wired = 'true';
     el.removeAttribute('onclick');
     el.addEventListener('click', handler);
+    // Also add touchend for mobile reliability with CSS transforms
+    el.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      handler();
+    }, { passive: false });
   };
 
   bindClick('.start-btns .btn-green', () => startGame());
   bindClick('#continue-patrol-btn', () => continueFromHome());
   bindClick('#story-skip-btn', () => goToMap());
-  bindClick('.story-btn-row .btn', () => goToMap());
+  bindClick('#story-begin-btn', () => goToMap());
 }
 
 // ============================================================
