@@ -2652,7 +2652,7 @@ body.mobile-device.mobile-portrait .mobile-rotate-overlay {
       <div class="story-beat-text" style="color:#f0d060;font-weight:900;font-size:17px;text-align:center;padding:4px 0;">&ldquo;I&apos;m on it.&rdquo;</div>
     </div>
 
-    <button onclick="goToMap()" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.06);color:#666;font-size:12px;padding:6px 14px;border:1px solid #333;border-radius:6px;cursor:pointer;letter-spacing:0.5px;">Skip ›</button>
+    <button id="story-skip-btn" onclick="goToMap()" style="position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.06);color:#666;font-size:12px;padding:6px 14px;border:1px solid #333;border-radius:6px;cursor:pointer;letter-spacing:0.5px;">Skip ›</button>
 
     <div class="story-btn-row">
       <button class="btn btn-green" onclick="goToMap()" style="font-size:15px;padding:12px 30px;">&#9889; Begin Patrol</button>
@@ -4775,7 +4775,7 @@ function applyLanguage() {
     const storyQuotes = document.querySelectorAll('#story-screen .story-beat-quote');
     if (storyQuotes[0]) storyQuotes[0].textContent = copy.storyBeat3Quote;
     if (storyQuotes[1]) storyQuotes[1].innerHTML = copy.storyBeat4Quote;
-    const skipBtn = document.querySelector('#story-screen button[onclick="goToMap()"]');
+    const skipBtn = document.getElementById('story-skip-btn');
     if (skipBtn) skipBtn.textContent = copy.storySkip;
     const storyBeginBtn = document.querySelector('.story-btn-row .btn');
     if (storyBeginBtn) storyBeginBtn.textContent = copy.storyBegin;
@@ -7270,6 +7270,21 @@ function updateMobileLayout() {
   }
 }
 
+function wirePrimaryButtons() {
+  const bindClick = (selector, handler) => {
+    const el = document.querySelector(selector);
+    if (!el || el.dataset.wired === 'true') return;
+    el.dataset.wired = 'true';
+    el.removeAttribute('onclick');
+    el.addEventListener('click', handler);
+  };
+
+  bindClick('.start-btns .btn-green', () => startGame());
+  bindClick('#continue-patrol-btn', () => continueFromHome());
+  bindClick('#story-skip-btn', () => goToMap());
+  bindClick('.story-btn-row .btn', () => goToMap());
+}
+
 // ============================================================
 //  INITIALIZE ON LOAD
 // ============================================================
@@ -7280,6 +7295,7 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 window.addEventListener('DOMContentLoaded', applyLanguage);
 window.addEventListener('DOMContentLoaded', updateMobileLayout);
+window.addEventListener('DOMContentLoaded', wirePrimaryButtons);
 window.addEventListener('resize', updateMobileLayout);
 window.addEventListener('orientationchange', () => setTimeout(updateMobileLayout, 120));
 if (window.visualViewport) {
