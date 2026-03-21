@@ -7358,6 +7358,7 @@ function wirePrimaryButtons() {
   bindClick('#continue-patrol-btn', () => continueFromHome());
   bindClick('#story-skip-btn', () => goToMap());
   bindClick('#story-begin-btn', () => goToMap());
+  bindClick('#mute-btn', () => toggleMute());
 }
 
 // ============================================================
@@ -7413,7 +7414,20 @@ const AudioEngine = (() => {
 
   function ensureCtx() {
     if (!initialized) init();
-    if (ctx && ctx.state === 'suspended') ctx.resume();
+    if (ctx && ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
+    // iOS Safari: also try creating a silent buffer to fully unlock
+    if (ctx && !ctx._unlocked) {
+      try {
+        const buf = ctx.createBuffer(1, 1, ctx.sampleRate);
+        const src = ctx.createBufferSource();
+        src.buffer = buf;
+        src.connect(ctx.destination);
+        src.start(0);
+        ctx._unlocked = true;
+      } catch(e) {}
+    }
     return !!ctx;
   }
 
@@ -8130,12 +8144,30 @@ window.addEventListener('DOMContentLoaded', () => {
   console.log('🏕️ Save the Park: Yellowstone Ranger Patrol loaded!');
 
   // Global button click sound — init audio on first interaction
-  document.getElementById('game-container').addEventListener('click', (e) => {
+  const gc = document.getElementById('game-container');
+
+  // Unlock AudioContext on first user gesture (critical for iOS/mobile)
+  let audioUnlocked = false;
+  function unlockAudio() {
+    if (audioUnlocked) return;
     AudioEngine.ensureCtx();
-    if (e.target.closest('.btn, button, .choice-option, .interactive')) {
+    audioUnlocked = true;
+    // Start music for whatever screen is currently active
+    const active = document.querySelector('.screen.active');
+    if (active) AudioEngine.onScreenChange(active.id);
+  }
+  gc.addEventListener('touchstart', unlockAudio, { once: false, passive: true });
+  gc.addEventListener('mousedown', unlockAudio, { once: false, passive: true });
+
+  // Button click/tap SFX
+  function handleBtnSound(e) {
+    const target = e.target;
+    if (target && target.closest('.btn, button, .choice-option, .interactive')) {
       AudioEngine.sfxClick();
     }
-  }, true);
+  }
+  gc.addEventListener('click', handleBtnSound, true);
+  gc.addEventListener('touchend', handleBtnSound, true);
 });
 window.addEventListener('DOMContentLoaded', applyLanguage);
 window.addEventListener('DOMContentLoaded', updateMobileLayout);
