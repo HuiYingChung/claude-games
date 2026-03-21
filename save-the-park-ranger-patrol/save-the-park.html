@@ -63,6 +63,30 @@ body {
 #health-bar-bg { flex: 1; height: 14px; background: #1a3a0a; border-radius: 7px; overflow: hidden; border: 1px solid #5a8a2a; }
 #health-bar-fill { height: 100%; width: 100%; background: linear-gradient(90deg,#6ab04c,#badc58); border-radius: 7px; transition: width 0.4s; }
 #hud-scene-name { color: #f0d060; font-size: 13px; font-weight: 800; margin-left: auto; text-shadow: 0 1px 4px rgba(0,0,0,0.5); font-family: 'Cinzel', serif; }
+#mute-btn {
+  position: absolute;
+  right: 14px;
+  bottom: 48px;
+  z-index: 220;
+  border: 1px solid rgba(255,255,255,0.24);
+  border-radius: 999px;
+  background: rgba(10,30,10,0.82);
+  color: #f7f4d1;
+  font-size: 15px;
+  font-weight: 800;
+  padding: 5px 9px;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.24);
+  backdrop-filter: blur(10px);
+  transition: transform 0.2s, background 0.2s, border-color 0.2s;
+  line-height: 1;
+}
+#mute-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(30,60,30,0.9);
+}
+#mute-btn:active { transform: translateY(0); }
+#mute-btn.muted { color: #ff7675; border-color: rgba(255,118,117,0.4); }
 #lang-toggle-btn {
   position: absolute;
   right: 14px;
@@ -2214,6 +2238,11 @@ body.mobile-device.mobile-portrait .mobile-rotate-overlay {
     font-size: 13px;
     padding: 1px 6px;
   }
+  #mute-btn {
+    bottom: 42px;
+    font-size: 13px;
+    padding: 4px 7px;
+  }
   #lang-toggle-btn,
   #exit-game-btn {
     bottom: 10px;
@@ -2608,6 +2637,7 @@ body.mobile-device.mobile-portrait .mobile-rotate-overlay {
 <body>
 <div id="game-container">
   <a id="exit-game-btn" href="../index.html">← Exit Game</a>
+  <button id="mute-btn" onclick="toggleMute()" title="Toggle Sound">🔊</button>
   <button id="lang-toggle-btn" onclick="toggleLanguage()">中文 / EN</button>
 
   <!-- HUD -->
@@ -5116,6 +5146,7 @@ function showScreen(id) {
     hud.classList.remove('visible');
   }
   updateMobileLayout();
+  AudioEngine.onScreenChange(id);
 }
 
 // ─── HUD UPDATE ─────────────────────────────────────────────
@@ -5211,6 +5242,7 @@ function showBriefing(scene) {
   const btn = document.querySelector('#briefing-screen .btn');
   if (btn) btn.textContent = _briefingReturnScene ? '▶ Resume Patrol' : '⚡ Mission Start';
   if (btn) btn.textContent = translateText(btn.textContent);
+  AudioEngine.sfxRadio();
   showScreen('briefing-screen');
 }
 
@@ -5767,8 +5799,13 @@ function _renderTimer() {
   const el = document.getElementById('hud-timer');
   if (!el) return;
   el.textContent = sceneTimeLeft + 's';
-  if (sceneTimeLeft <= 12) el.classList.add('urgent');
-  else el.classList.remove('urgent');
+  if (sceneTimeLeft <= 12) {
+    el.classList.add('urgent');
+    if (sceneTimeLeft <= 5) AudioEngine.sfxTimerUrgent();
+    else AudioEngine.sfxTimerTick();
+  } else {
+    el.classList.remove('urgent');
+  }
 }
 
 function _handleTimerExpiry(scene) {
@@ -5868,6 +5905,8 @@ function _triggerBisonCharge() {
   const remaining = sc.visitorsTotal - sc.visitorsFixed;
   if (remaining <= 0) return; // all visitors already safe
 
+  AudioEngine.sfxBisonCharge();
+  AudioEngine.sfxWarning();
   const penalty = remaining * -12;
   addScore(penalty);
 
@@ -6306,8 +6345,10 @@ function addScore(pts) {
   state.score = Math.max(0, state.score + pts);
   if (pts > 0) {
     state.parkHealth = Math.min(100, state.parkHealth + Math.floor(pts / 4));
+    AudioEngine.sfxPositive();
   } else {
     state.parkHealth = Math.max(0, state.parkHealth + pts);
+    AudioEngine.sfxNegative();
   }
   updateHUD();
 }
@@ -6315,7 +6356,10 @@ function addScore(pts) {
 // ─── MARK TASK DONE ─────────────────────────────────────────
 function markTaskDone(taskId) {
   const el = document.getElementById(taskId);
-  if (el && !el.classList.contains('done')) el.classList.add('done');
+  if (el && !el.classList.contains('done')) {
+    el.classList.add('done');
+    AudioEngine.sfxTaskComplete();
+  }
 }
 
 // ============================================================
@@ -6453,6 +6497,7 @@ function handleSceneChoice(scene, selectedIndex) {
   state.scenes[scene].briefingDone = true;
   markTaskDone(taskMap[scene]);
   addScore(10);
+  AudioEngine.sfxQuizCorrect();
   setFeedback(scene + '-feedback', q.successMsg + ' (+10)', 'good');
 
   const panel = document.getElementById(panelId);
@@ -6900,6 +6945,8 @@ function triggerSceneComplete(scene) {
   addScore(PTS.sceneBonus);
   state.completedZones.push(scene);
   state.badges.push(scene);
+  AudioEngine.sfxZoneComplete();
+  setTimeout(() => AudioEngine.sfxBadge(), 600);
 
   const bonusPtsEl = document.getElementById(scene + '-bonus-pts');
   if (bonusPtsEl) setLocalizedText(bonusPtsEl, `+${PTS.sceneBonus} Bonus Points! Total: ${state.score}`);
@@ -6935,6 +6982,8 @@ function completeScene(scene) {
 function showResults() {
   // Determine rank
   const score = state.score;
+  if (score >= 70) AudioEngine.sfxResultsHero();
+  else AudioEngine.sfxResultsOk();
   let rank, rankColor;
   if (score >= 90) { rank = '🏆 Park Hero'; rankColor = '#f0d060'; }
   else if (score >= 70) { rank = '🌿 Wildlife Guardian'; rankColor = '#badc58'; }
@@ -7030,6 +7079,7 @@ function initDragAndDrop(scene) {
 function startDrag(e, cfg, el) {
   if (el.classList.contains('done')) return;
   e.preventDefault();
+  AudioEngine.sfxDragStart();
   activeDrag = cfg;
   dragEl = el;
 
@@ -7129,6 +7179,7 @@ function finalizeDrop(clientX, clientY) {
   }
 
   if (dropped) {
+    AudioEngine.sfxDropSuccess();
     // Snap into drop zone
     const scale = getMobileScale();
     const area = document.getElementById(cfg.areaId);
@@ -7188,6 +7239,7 @@ function finalizeDrop(clientX, clientY) {
 
   } else {
     // Snap back to original position
+    AudioEngine.sfxDropFail();
     dropZone && dropZone.classList.remove('highlight');
     dragEl.style.left = dragStartX + 'px';
     dragEl.style.top = dragStartY + 'px';
@@ -7199,6 +7251,8 @@ function finalizeDrop(clientX, clientY) {
 }
 
 function showBearWarning() {
+  AudioEngine.sfxBearGrowl();
+  AudioEngine.sfxWarning();
   const bear = document.getElementById('bear-warn');
   if (!bear) return;
   bear.style.opacity = '1';
@@ -7221,12 +7275,14 @@ function pauseGame() {
   const el = document.getElementById('pause-scene-name');
   if (el) setLocalizedText(el, sceneNames[_pausedScene] || _pausedScene);
   document.getElementById('pause-overlay').classList.add('active');
+  AudioEngine.sfxPause();
 }
 
 function resumeGame() {
   gamePaused = false;
   document.getElementById('pause-overlay').classList.remove('active');
   _pausedScene = null;
+  AudioEngine.sfxResume();
 }
 
 function rereadMission() {
@@ -7305,12 +7361,775 @@ function wirePrimaryButtons() {
 }
 
 // ============================================================
+//  AUDIO ENGINE — Web Audio API Synthesizer
+// ============================================================
+
+const AudioEngine = (() => {
+  let ctx = null;
+  let masterGain = null;
+  let musicGain = null;
+  let sfxGain = null;
+  let ambientGain = null;
+  let muted = false;
+  let currentMusic = null;
+  let currentAmbient = null;
+  let musicNodes = [];
+  let ambientNodes = [];
+  let initialized = false;
+
+  // Note frequencies (octave 4)
+  const NOTE = {
+    C3:130.81, D3:146.83, E3:164.81, F3:174.61, G3:196.00, A3:220.00, B3:246.94,
+    C4:261.63, D4:293.66, E4:329.63, F4:349.23, G4:392.00, A4:440.00, B4:493.88,
+    C5:523.25, D5:587.33, E5:659.25, F5:698.46, G5:783.99, A5:880.00, B5:987.77,
+    C6:1046.50
+  };
+
+  function init() {
+    if (initialized) return;
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = ctx.createGain();
+      masterGain.gain.value = 0.5;
+      masterGain.connect(ctx.destination);
+
+      musicGain = ctx.createGain();
+      musicGain.gain.value = 0.35;
+      musicGain.connect(masterGain);
+
+      sfxGain = ctx.createGain();
+      sfxGain.gain.value = 0.6;
+      sfxGain.connect(masterGain);
+
+      ambientGain = ctx.createGain();
+      ambientGain.gain.value = 0.2;
+      ambientGain.connect(masterGain);
+
+      initialized = true;
+    } catch (e) {
+      console.warn('Web Audio API not available:', e);
+    }
+  }
+
+  function ensureCtx() {
+    if (!initialized) init();
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+    return !!ctx;
+  }
+
+  // ─── SOUND SYNTHESIS HELPERS ─────────────────────────────────
+
+  function playTone(freq, type, duration, gainVal, dest, startTime) {
+    if (!ensureCtx()) return null;
+    const t = startTime || ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, t);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(gainVal || 0.3, t + 0.02);
+    gain.gain.linearRampToValueAtTime(0, t + duration);
+    osc.connect(gain);
+    gain.connect(dest || sfxGain);
+    osc.start(t);
+    osc.stop(t + duration + 0.05);
+    return osc;
+  }
+
+  function createNoise(duration, dest) {
+    if (!ensureCtx()) return null;
+    const bufferSize = ctx.sampleRate * duration;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 400;
+    source.connect(filter);
+    filter.connect(dest || ambientGain);
+    return { source, filter };
+  }
+
+  // ─── SFX (One-shot sounds) ──────────────────────────────────
+
+  function sfxClick() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(800, 'sine', 0.08, 0.15, sfxGain, t);
+    playTone(1200, 'sine', 0.06, 0.08, sfxGain, t + 0.01);
+  }
+
+  function sfxPositive() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(NOTE.E5, 'sine', 0.12, 0.2, sfxGain, t);
+    playTone(NOTE.G5, 'sine', 0.12, 0.2, sfxGain, t + 0.08);
+    playTone(NOTE.C6, 'sine', 0.2, 0.15, sfxGain, t + 0.16);
+  }
+
+  function sfxNegative() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(350, 'sawtooth', 0.15, 0.12, sfxGain, t);
+    playTone(250, 'sawtooth', 0.2, 0.12, sfxGain, t + 0.1);
+  }
+
+  function sfxDragStart() {
+    if (!ensureCtx() || muted) return;
+    playTone(600, 'sine', 0.08, 0.12, sfxGain);
+  }
+
+  function sfxDropSuccess() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(NOTE.C5, 'sine', 0.1, 0.2, sfxGain, t);
+    playTone(NOTE.E5, 'sine', 0.1, 0.2, sfxGain, t + 0.06);
+    playTone(NOTE.G5, 'sine', 0.15, 0.15, sfxGain, t + 0.12);
+  }
+
+  function sfxDropFail() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(400, 'triangle', 0.1, 0.15, sfxGain, t);
+    playTone(300, 'triangle', 0.15, 0.15, sfxGain, t + 0.08);
+  }
+
+  function sfxTaskComplete() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(NOTE.G4, 'sine', 0.12, 0.2, sfxGain, t);
+    playTone(NOTE.B4, 'sine', 0.12, 0.2, sfxGain, t + 0.1);
+    playTone(NOTE.D5, 'sine', 0.12, 0.2, sfxGain, t + 0.2);
+    playTone(NOTE.G5, 'sine', 0.3, 0.18, sfxGain, t + 0.3);
+  }
+
+  function sfxZoneComplete() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    const notes = [NOTE.C5, NOTE.E5, NOTE.G5, NOTE.C6];
+    notes.forEach((n, i) => {
+      playTone(n, 'sine', 0.2, 0.2, sfxGain, t + i * 0.12);
+      playTone(n * 1.5, 'sine', 0.15, 0.08, sfxGain, t + i * 0.12 + 0.02);
+    });
+  }
+
+  function sfxBadge() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    const fanfare = [NOTE.G4, NOTE.C5, NOTE.E5, NOTE.G5, NOTE.E5, NOTE.G5];
+    fanfare.forEach((n, i) => {
+      playTone(n, 'sine', 0.15, 0.2, sfxGain, t + i * 0.1);
+    });
+  }
+
+  function sfxWarning() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    for (let i = 0; i < 3; i++) {
+      playTone(880, 'square', 0.08, 0.1, sfxGain, t + i * 0.15);
+    }
+  }
+
+  function sfxBearGrowl() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(80, t);
+    osc.frequency.linearRampToValueAtTime(60, t + 0.6);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.2, t + 0.1);
+    gain.gain.linearRampToValueAtTime(0.15, t + 0.4);
+    gain.gain.linearRampToValueAtTime(0, t + 0.7);
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 200;
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(sfxGain);
+    osc.start(t);
+    osc.stop(t + 0.8);
+  }
+
+  function sfxBisonCharge() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(50, t);
+    osc.frequency.linearRampToValueAtTime(90, t + 0.3);
+    osc.frequency.linearRampToValueAtTime(40, t + 0.5);
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.15, t + 0.15);
+    gain.gain.linearRampToValueAtTime(0, t + 0.6);
+    osc.connect(gain);
+    gain.connect(sfxGain);
+    osc.start(t);
+    osc.stop(t + 0.7);
+  }
+
+  function sfxRadio() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    // Static crackle
+    const noise = createNoise(0.3, sfxGain);
+    if (noise) {
+      noise.filter.frequency.value = 3000;
+      const noiseGain = ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.08, t);
+      noiseGain.gain.linearRampToValueAtTime(0, t + 0.3);
+      noise.filter.disconnect();
+      noise.filter.connect(noiseGain);
+      noiseGain.connect(sfxGain);
+      noise.source.start(t);
+      noise.source.stop(t + 0.35);
+    }
+    playTone(1400, 'sine', 0.05, 0.08, sfxGain, t);
+    playTone(1800, 'sine', 0.05, 0.06, sfxGain, t + 0.03);
+  }
+
+  function sfxTimerTick() {
+    if (!ensureCtx() || muted) return;
+    playTone(1000, 'sine', 0.04, 0.08, sfxGain);
+  }
+
+  function sfxTimerUrgent() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(1200, 'square', 0.06, 0.1, sfxGain, t);
+    playTone(900, 'square', 0.06, 0.1, sfxGain, t + 0.08);
+  }
+
+  function sfxScreenTransition() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    // Gentle whoosh using filtered noise
+    const noise = createNoise(0.25, sfxGain);
+    if (noise) {
+      noise.filter.type = 'bandpass';
+      noise.filter.frequency.value = 1200;
+      noise.filter.Q.value = 0.5;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.1, t + 0.05);
+      g.gain.linearRampToValueAtTime(0, t + 0.25);
+      noise.filter.disconnect();
+      noise.filter.connect(g);
+      g.connect(sfxGain);
+      noise.source.start(t);
+      noise.source.stop(t + 0.3);
+    }
+  }
+
+  function sfxQuizCorrect() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(NOTE.C5, 'sine', 0.12, 0.2, sfxGain, t);
+    playTone(NOTE.E5, 'sine', 0.12, 0.2, sfxGain, t + 0.1);
+    playTone(NOTE.G5, 'triangle', 0.25, 0.15, sfxGain, t + 0.2);
+  }
+
+  function sfxResultsHero() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    const melody = [NOTE.C5, NOTE.E5, NOTE.G5, NOTE.C6, NOTE.G5, NOTE.C6];
+    melody.forEach((n, i) => {
+      playTone(n, 'sine', 0.2, 0.18, sfxGain, t + i * 0.15);
+      playTone(n * 0.5, 'triangle', 0.25, 0.08, sfxGain, t + i * 0.15);
+    });
+  }
+
+  function sfxResultsOk() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    const melody = [NOTE.C4, NOTE.E4, NOTE.G4, NOTE.C5];
+    melody.forEach((n, i) => {
+      playTone(n, 'sine', 0.25, 0.15, sfxGain, t + i * 0.2);
+    });
+  }
+
+  function sfxPause() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(NOTE.G4, 'sine', 0.15, 0.12, sfxGain, t);
+    playTone(NOTE.E4, 'sine', 0.2, 0.1, sfxGain, t + 0.1);
+  }
+
+  function sfxResume() {
+    if (!ensureCtx() || muted) return;
+    const t = ctx.currentTime;
+    playTone(NOTE.E4, 'sine', 0.12, 0.12, sfxGain, t);
+    playTone(NOTE.G4, 'sine', 0.15, 0.1, sfxGain, t + 0.08);
+  }
+
+  // ─── BACKGROUND MUSIC ────────────────────────────────────────
+
+  function stopMusic() {
+    musicNodes.forEach(n => { try { n.stop(); } catch(e){} });
+    musicNodes = [];
+    currentMusic = null;
+  }
+
+  function stopAmbient() {
+    ambientNodes.forEach(n => { try { n.stop(); } catch(e){} });
+    ambientNodes = [];
+    currentAmbient = null;
+  }
+
+  function playChordLoop(chords, tempo, waveType, filterFreq) {
+    if (!ensureCtx() || muted) return;
+    stopMusic();
+    const beatDur = 60 / (tempo || 70);
+    let t = ctx.currentTime + 0.05;
+    const totalBars = chords.length;
+    const loopDur = totalBars * 4 * beatDur;
+
+    function scheduleLoop() {
+      if (currentMusic !== scheduleLoop) return;
+      chords.forEach((chord, ci) => {
+        const barStart = t + ci * 4 * beatDur;
+        chord.forEach((freq, ni) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = waveType || 'sine';
+          osc.frequency.value = freq;
+          gain.gain.setValueAtTime(0, barStart);
+          gain.gain.linearRampToValueAtTime(0.12, barStart + 0.15);
+          gain.gain.setValueAtTime(0.1, barStart + 3.5 * beatDur);
+          gain.gain.linearRampToValueAtTime(0, barStart + 4 * beatDur);
+
+          if (filterFreq) {
+            const flt = ctx.createBiquadFilter();
+            flt.type = 'lowpass';
+            flt.frequency.value = filterFreq;
+            osc.connect(flt);
+            flt.connect(gain);
+          } else {
+            osc.connect(gain);
+          }
+          gain.connect(musicGain);
+          osc.start(barStart);
+          osc.stop(barStart + 4 * beatDur + 0.1);
+          musicNodes.push(osc);
+
+          // Arpeggio on top
+          if (ni < chord.length) {
+            const arpOsc = ctx.createOscillator();
+            const arpGain = ctx.createGain();
+            arpOsc.type = 'triangle';
+            arpOsc.frequency.value = freq * 2;
+            const arpTime = barStart + ni * beatDur * 0.8;
+            arpGain.gain.setValueAtTime(0, arpTime);
+            arpGain.gain.linearRampToValueAtTime(0.06, arpTime + 0.05);
+            arpGain.gain.linearRampToValueAtTime(0, arpTime + beatDur * 0.7);
+            arpOsc.connect(arpGain);
+            arpGain.connect(musicGain);
+            arpOsc.start(arpTime);
+            arpOsc.stop(arpTime + beatDur + 0.1);
+            musicNodes.push(arpOsc);
+          }
+        });
+      });
+      t += loopDur;
+      setTimeout(() => scheduleLoop(), (loopDur - 2) * 1000);
+    }
+
+    currentMusic = scheduleLoop;
+    scheduleLoop();
+  }
+
+  // Music presets
+  function musicTitle() {
+    // Peaceful C major: C-Am-F-G
+    playChordLoop([
+      [NOTE.C4, NOTE.E4, NOTE.G4],
+      [NOTE.A3, NOTE.C4, NOTE.E4],
+      [NOTE.F3, NOTE.A3, NOTE.C4],
+      [NOTE.G3, NOTE.B3, NOTE.D4]
+    ], 55, 'sine', 600);
+  }
+
+  function musicStory() {
+    // Atmospheric building: Dm-Am-Bb-C
+    playChordLoop([
+      [NOTE.D3, NOTE.F3, NOTE.A3],
+      [NOTE.A3, NOTE.C4, NOTE.E4],
+      [233.08, NOTE.D4, NOTE.F4], // Bb3
+      [NOTE.C4, NOTE.E4, NOTE.G4]
+    ], 50, 'sine', 500);
+  }
+
+  function musicMap() {
+    // Adventure: G-Em-C-D
+    playChordLoop([
+      [NOTE.G3, NOTE.B3, NOTE.D4],
+      [NOTE.E3, NOTE.G3, NOTE.B3],
+      [NOTE.C4, NOTE.E4, NOTE.G4],
+      [NOTE.D4, NOTE.F4+17, NOTE.A4] // F#4 ≈ 370
+    ], 65, 'triangle', 800);
+  }
+
+  function musicScene(scene) {
+    const themes = {
+      geyser: { // Mysterious D minor
+        chords: [[NOTE.D3,NOTE.F3,NOTE.A3],[NOTE.A3,NOTE.C4,NOTE.E4],[233.08,NOTE.D4,NOTE.F4],[NOTE.C4,NOTE.E4,NOTE.G4]],
+        tempo: 60, wave: 'sine', filter: 550
+      },
+      bison: { // Open E minor
+        chords: [[NOTE.E3,NOTE.G3,NOTE.B3],[NOTE.C4,NOTE.E4,NOTE.G4],[NOTE.D4,NOTE.F4+17,NOTE.A4],[NOTE.E3,NOTE.G3,NOTE.B3]],
+        tempo: 58, wave: 'triangle', filter: 650
+      },
+      camp: { // Warm A minor
+        chords: [[NOTE.A3,NOTE.C4,NOTE.E4],[NOTE.F3,NOTE.A3,NOTE.C4],[NOTE.G3,NOTE.B3,NOTE.D4],[NOTE.E3,NOTE.G3,NOTE.B3]],
+        tempo: 55, wave: 'sine', filter: 700
+      },
+      trail: { // Mysterious B minor
+        chords: [[NOTE.B3,NOTE.D4,NOTE.F4+17],[NOTE.G3,NOTE.B3,NOTE.D4],[NOTE.A3,NOTE.C4+17,NOTE.E4],[NOTE.F3+17,NOTE.A3,NOTE.C4+17]],
+        tempo: 52, wave: 'sine', filter: 500
+      },
+      lake: { // Flowing F# minor / gentle
+        chords: [[NOTE.F3+17,NOTE.A3,NOTE.C4+17],[NOTE.D4,NOTE.F4+17,NOTE.A4],[NOTE.E4,NOTE.G4+12,NOTE.B4],[NOTE.C4+17,NOTE.E4,NOTE.G4+12]],
+        tempo: 50, wave: 'sine', filter: 550
+      }
+    };
+    const t = themes[scene] || themes.geyser;
+    playChordLoop(t.chords, t.tempo, t.wave, t.filter);
+  }
+
+  function musicBriefing() {
+    // Urgent, pulsing
+    playChordLoop([
+      [NOTE.D3, NOTE.A3],
+      [NOTE.D3, NOTE.F3],
+      [NOTE.C3, NOTE.G3],
+      [NOTE.C3, NOTE.E3]
+    ], 80, 'square', 400);
+  }
+
+  function musicResults(score) {
+    if (score >= 70) {
+      // Triumphant C major
+      playChordLoop([
+        [NOTE.C4, NOTE.E4, NOTE.G4],
+        [NOTE.F3, NOTE.A3, NOTE.C4],
+        [NOTE.G3, NOTE.B3, NOTE.D4],
+        [NOTE.C4, NOTE.E4, NOTE.G4]
+      ], 70, 'sine', 900);
+    } else {
+      // Reflective A minor
+      playChordLoop([
+        [NOTE.A3, NOTE.C4, NOTE.E4],
+        [NOTE.D3, NOTE.F3, NOTE.A3],
+        [NOTE.E3, NOTE.G3, NOTE.B3],
+        [NOTE.A3, NOTE.C4, NOTE.E4]
+      ], 48, 'sine', 500);
+    }
+  }
+
+  // ─── AMBIENT SOUNDS ──────────────────────────────────────────
+
+  function playAmbientLoop(type) {
+    if (!ensureCtx() || muted) return;
+    stopAmbient();
+    currentAmbient = type;
+
+    const loopDur = 4; // seconds per cycle
+
+    function scheduleAmbient() {
+      if (currentAmbient !== type) return;
+      const t = ctx.currentTime;
+
+      if (type === 'geyser') {
+        // Bubbling: filtered noise bursts
+        for (let i = 0; i < 6; i++) {
+          const burst = createNoise(0.3 + Math.random() * 0.3);
+          if (burst) {
+            burst.filter.frequency.value = 300 + Math.random() * 400;
+            const g = ctx.createGain();
+            const bt = t + Math.random() * loopDur;
+            g.gain.setValueAtTime(0, bt);
+            g.gain.linearRampToValueAtTime(0.08, bt + 0.05);
+            g.gain.linearRampToValueAtTime(0, bt + 0.3);
+            burst.filter.disconnect();
+            burst.filter.connect(g);
+            g.connect(ambientGain);
+            burst.source.start(bt);
+            burst.source.stop(bt + 0.4);
+            ambientNodes.push(burst.source);
+          }
+        }
+        // Steam hiss
+        const hiss = createNoise(loopDur);
+        if (hiss) {
+          hiss.filter.type = 'highpass';
+          hiss.filter.frequency.value = 4000;
+          const hg = ctx.createGain();
+          hg.gain.value = 0.03;
+          hiss.filter.disconnect();
+          hiss.filter.connect(hg);
+          hg.connect(ambientGain);
+          hiss.source.start(t);
+          hiss.source.stop(t + loopDur + 0.1);
+          ambientNodes.push(hiss.source);
+        }
+      }
+
+      else if (type === 'bison') {
+        // Wind
+        const wind = createNoise(loopDur);
+        if (wind) {
+          wind.filter.frequency.value = 250;
+          const wg = ctx.createGain();
+          wg.gain.setValueAtTime(0.04, t);
+          wg.gain.linearRampToValueAtTime(0.07, t + loopDur / 2);
+          wg.gain.linearRampToValueAtTime(0.04, t + loopDur);
+          wind.filter.disconnect();
+          wind.filter.connect(wg);
+          wg.connect(ambientGain);
+          wind.source.start(t);
+          wind.source.stop(t + loopDur + 0.1);
+          ambientNodes.push(wind.source);
+        }
+        // Distant low rumble
+        const rumble = ctx.createOscillator();
+        const rg = ctx.createGain();
+        rumble.type = 'sine';
+        rumble.frequency.value = 45 + Math.random() * 15;
+        rg.gain.setValueAtTime(0, t);
+        rg.gain.linearRampToValueAtTime(0.04, t + 1);
+        rg.gain.linearRampToValueAtTime(0, t + loopDur);
+        rumble.connect(rg);
+        rg.connect(ambientGain);
+        rumble.start(t);
+        rumble.stop(t + loopDur + 0.1);
+        ambientNodes.push(rumble);
+      }
+
+      else if (type === 'camp') {
+        // Crackling fire: rapid filtered noise bursts
+        for (let i = 0; i < 12; i++) {
+          const crack = createNoise(0.08);
+          if (crack) {
+            crack.filter.frequency.value = 2000 + Math.random() * 3000;
+            const cg = ctx.createGain();
+            const ct = t + Math.random() * loopDur;
+            cg.gain.setValueAtTime(0, ct);
+            cg.gain.linearRampToValueAtTime(0.06 + Math.random() * 0.04, ct + 0.01);
+            cg.gain.linearRampToValueAtTime(0, ct + 0.08);
+            crack.filter.disconnect();
+            crack.filter.connect(cg);
+            cg.connect(ambientGain);
+            crack.source.start(ct);
+            crack.source.stop(ct + 0.12);
+            ambientNodes.push(crack.source);
+          }
+        }
+        // Cricket chirps: high sine pulses
+        for (let i = 0; i < 3; i++) {
+          const chirpT = t + 0.5 + Math.random() * 3;
+          const chirpOsc = ctx.createOscillator();
+          const chirpG = ctx.createGain();
+          chirpOsc.type = 'sine';
+          chirpOsc.frequency.value = 4500 + Math.random() * 1000;
+          chirpG.gain.setValueAtTime(0, chirpT);
+          for (let p = 0; p < 4; p++) {
+            const pt = chirpT + p * 0.08;
+            chirpG.gain.linearRampToValueAtTime(0.04, pt + 0.015);
+            chirpG.gain.linearRampToValueAtTime(0, pt + 0.04);
+          }
+          chirpOsc.connect(chirpG);
+          chirpG.connect(ambientGain);
+          chirpOsc.start(chirpT);
+          chirpOsc.stop(chirpT + 0.5);
+          ambientNodes.push(chirpOsc);
+        }
+      }
+
+      else if (type === 'trail') {
+        // Wind in trees
+        const wind = createNoise(loopDur);
+        if (wind) {
+          wind.filter.frequency.value = 350;
+          const wg = ctx.createGain();
+          wg.gain.setValueAtTime(0.03, t);
+          wg.gain.linearRampToValueAtTime(0.06, t + 1.5);
+          wg.gain.linearRampToValueAtTime(0.03, t + 3);
+          wg.gain.linearRampToValueAtTime(0.05, t + loopDur);
+          wind.filter.disconnect();
+          wind.filter.connect(wg);
+          wg.connect(ambientGain);
+          wind.source.start(t);
+          wind.source.stop(t + loopDur + 0.1);
+          ambientNodes.push(wind.source);
+        }
+        // Bird calls: short sine glissandos
+        for (let i = 0; i < 2; i++) {
+          const birdT = t + 0.8 + Math.random() * 2.5;
+          const bOsc = ctx.createOscillator();
+          const bG = ctx.createGain();
+          bOsc.type = 'sine';
+          bOsc.frequency.setValueAtTime(2000 + Math.random() * 1500, birdT);
+          bOsc.frequency.linearRampToValueAtTime(2500 + Math.random() * 1500, birdT + 0.15);
+          bOsc.frequency.linearRampToValueAtTime(1800 + Math.random() * 800, birdT + 0.3);
+          bG.gain.setValueAtTime(0, birdT);
+          bG.gain.linearRampToValueAtTime(0.04, birdT + 0.02);
+          bG.gain.linearRampToValueAtTime(0, birdT + 0.3);
+          bOsc.connect(bG);
+          bG.connect(ambientGain);
+          bOsc.start(birdT);
+          bOsc.stop(birdT + 0.35);
+          ambientNodes.push(bOsc);
+        }
+      }
+
+      else if (type === 'lake') {
+        // Water lapping: filtered noise waves
+        for (let i = 0; i < 3; i++) {
+          const wave = createNoise(1.2);
+          if (wave) {
+            wave.filter.frequency.value = 350;
+            const wg = ctx.createGain();
+            const wt = t + i * 1.3;
+            wg.gain.setValueAtTime(0, wt);
+            wg.gain.linearRampToValueAtTime(0.06, wt + 0.3);
+            wg.gain.linearRampToValueAtTime(0.02, wt + 0.8);
+            wg.gain.linearRampToValueAtTime(0, wt + 1.2);
+            wave.filter.disconnect();
+            wave.filter.connect(wg);
+            wg.connect(ambientGain);
+            wave.source.start(wt);
+            wave.source.stop(wt + 1.3);
+            ambientNodes.push(wave.source);
+          }
+        }
+        // Distant bird
+        const birdT = t + 1.5 + Math.random() * 2;
+        const bOsc = ctx.createOscillator();
+        const bG = ctx.createGain();
+        bOsc.type = 'sine';
+        bOsc.frequency.setValueAtTime(3000, birdT);
+        bOsc.frequency.linearRampToValueAtTime(3500, birdT + 0.1);
+        bOsc.frequency.linearRampToValueAtTime(2800, birdT + 0.25);
+        bG.gain.setValueAtTime(0, birdT);
+        bG.gain.linearRampToValueAtTime(0.03, birdT + 0.02);
+        bG.gain.linearRampToValueAtTime(0, birdT + 0.25);
+        bOsc.connect(bG);
+        bG.connect(ambientGain);
+        bOsc.start(birdT);
+        bOsc.stop(birdT + 0.3);
+        ambientNodes.push(bOsc);
+      }
+
+      setTimeout(() => scheduleAmbient(), (loopDur - 0.5) * 1000);
+    }
+    scheduleAmbient();
+  }
+
+  // ─── MUTE CONTROL ────────────────────────────────────────────
+
+  function toggleMuteState() {
+    ensureCtx();
+    muted = !muted;
+    if (masterGain) masterGain.gain.value = muted ? 0 : 0.5;
+    if (muted) {
+      stopMusic();
+      stopAmbient();
+    }
+    return muted;
+  }
+
+  function isMuted() { return muted; }
+
+  // ─── SCREEN-BASED AUDIO ROUTER ───────────────────────────────
+
+  function onScreenChange(screenId) {
+    if (!ensureCtx()) return;
+    sfxScreenTransition();
+
+    const sceneMap = {
+      'geyser-screen': 'geyser',
+      'bison-screen': 'bison',
+      'camp-screen': 'camp',
+      'trail-screen': 'trail',
+      'lake-screen': 'lake'
+    };
+
+    const sceneName = sceneMap[screenId];
+
+    if (sceneName) {
+      musicScene(sceneName);
+      playAmbientLoop(sceneName);
+    } else if (screenId === 'start-screen') {
+      musicTitle();
+      stopAmbient();
+    } else if (screenId === 'story-screen') {
+      musicStory();
+      stopAmbient();
+    } else if (screenId === 'map-screen') {
+      musicMap();
+      stopAmbient();
+    } else if (screenId === 'briefing-screen') {
+      musicBriefing();
+      stopAmbient();
+    } else if (screenId === 'result-screen') {
+      musicResults(state ? state.score : 50);
+      stopAmbient();
+    } else {
+      stopMusic();
+      stopAmbient();
+    }
+  }
+
+  return {
+    init, ensureCtx,
+    sfxClick, sfxPositive, sfxNegative,
+    sfxDragStart, sfxDropSuccess, sfxDropFail,
+    sfxTaskComplete, sfxZoneComplete, sfxBadge,
+    sfxWarning, sfxBearGrowl, sfxBisonCharge,
+    sfxRadio, sfxTimerTick, sfxTimerUrgent,
+    sfxScreenTransition, sfxQuizCorrect,
+    sfxResultsHero, sfxResultsOk,
+    sfxPause, sfxResume,
+    onScreenChange, toggleMuteState, isMuted,
+    stopMusic, stopAmbient
+  };
+})();
+
+// Global mute toggle wired to button
+function toggleMute() {
+  AudioEngine.ensureCtx();
+  const muted = AudioEngine.toggleMuteState();
+  const btn = document.getElementById('mute-btn');
+  if (btn) {
+    btn.textContent = muted ? '🔇' : '🔊';
+    btn.classList.toggle('muted', muted);
+  }
+  // Re-trigger music for current screen if unmuting
+  if (!muted) {
+    const active = document.querySelector('.screen.active');
+    if (active) AudioEngine.onScreenChange(active.id);
+  }
+}
+
+// ============================================================
 //  INITIALIZE ON LOAD
 // ============================================================
 window.addEventListener('DOMContentLoaded', () => {
   // Everything starts from start screen — already set active in HTML
   // No auto-start; wait for player to click
   console.log('🏕️ Save the Park: Yellowstone Ranger Patrol loaded!');
+
+  // Global button click sound — init audio on first interaction
+  document.getElementById('game-container').addEventListener('click', (e) => {
+    AudioEngine.ensureCtx();
+    if (e.target.closest('.btn, button, .choice-option, .interactive')) {
+      AudioEngine.sfxClick();
+    }
+  }, true);
 });
 window.addEventListener('DOMContentLoaded', applyLanguage);
 window.addEventListener('DOMContentLoaded', updateMobileLayout);
