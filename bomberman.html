@@ -596,12 +596,35 @@ let soundEnabled = true;
 function toggleSound() {
   soundEnabled = !soundEnabled;
   document.getElementById('btn-sound').textContent = soundEnabled ? '🔊 Sound' : '🔇 Mute';
+  if (soundEnabled) unlockAudio();
 }
 let audioCtx = null;
+let audioUnlocked = false;
 function ensureAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
+}
+
+function unlockAudio() {
+  if (!soundEnabled) return;
+  try {
+    const ctx = ensureAudio();
+    const resumeResult = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
+    Promise.resolve(resumeResult).then(() => {
+      if (audioUnlocked) return;
+      // Play a near-silent buffer inside a user gesture to satisfy mobile autoplay policies.
+      const buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+      const source = ctx.createBufferSource();
+      const gain = ctx.createGain();
+      gain.gain.value = 0.0001;
+      source.buffer = buffer;
+      source.connect(gain);
+      gain.connect(ctx.destination);
+      source.start(0);
+      audioUnlocked = true;
+    }).catch(() => {});
+  } catch (_) {}
 }
 
 const SFX = {
@@ -864,6 +887,7 @@ function setupMobileControls() {
 
     btn.addEventListener('touchstart', e => {
       e.preventDefault();
+      unlockAudio();
       if (activeDpadDir && activeDpadDir !== dir) {
         keys[activeDpadDir] = false;
         document.querySelector(`.dpad-btn[data-dir="${activeDpadDir}"]`)?.classList.remove('active');
@@ -891,6 +915,7 @@ function setupMobileControls() {
   const fireBtn = document.getElementById('fireBtn');
   fireBtn.addEventListener('touchstart', e => {
     e.preventDefault();
+    unlockAudio();
     mobilePendingBomb = true;
     fireBtn.classList.add('active');
   }, { passive: false });
@@ -907,6 +932,7 @@ function setupMobileControls() {
   // Pause button
   document.getElementById('mobilePauseBtn').addEventListener('touchstart', e => {
     e.preventDefault();
+    unlockAudio();
     if (gameRunning) togglePause();
   }, { passive: false });
 
@@ -990,6 +1016,7 @@ function spawnEnemies(lvl) {
 }
 
 function startGame() {
+  unlockAudio();
   document.getElementById('start-screen').classList.add('hidden');
   document.getElementById('game-over-screen').classList.add('hidden');
   document.getElementById('action-bar').classList.remove('hidden');
