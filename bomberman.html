@@ -602,7 +602,6 @@ let audioCtx = null;
 let audioUnlocked = false;
 function ensureAudio() {
   if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  if (audioCtx.state === 'suspended') audioCtx.resume();
   return audioCtx;
 }
 
@@ -610,21 +609,33 @@ function unlockAudio() {
   if (!soundEnabled) return;
   try {
     const ctx = ensureAudio();
-    const resumeResult = ctx.state === 'suspended' ? ctx.resume() : Promise.resolve();
-    Promise.resolve(resumeResult).then(() => {
-      if (audioUnlocked) return;
-      // Play a near-silent buffer inside a user gesture to satisfy mobile autoplay policies.
-      const buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
-      const source = ctx.createBufferSource();
-      const gain = ctx.createGain();
-      gain.gain.value = 0.0001;
-      source.buffer = buffer;
-      source.connect(gain);
-      gain.connect(ctx.destination);
-      source.start(0);
-      audioUnlocked = true;
-    }).catch(() => {});
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    if (audioUnlocked) return;
+
+    // Keep this synchronous so mobile browsers still treat it as part of the gesture.
+    const buffer = ctx.createBuffer(1, 1, ctx.sampleRate);
+    const source = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    gain.gain.value = 0.0001;
+    source.buffer = buffer;
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    source.start(0);
+    audioUnlocked = true;
   } catch (_) {}
+}
+
+function installAudioUnlockHandlers() {
+  const unlockOnce = () => {
+    unlockAudio();
+    if (!audioUnlocked) return;
+    ['pointerdown', 'touchend', 'click', 'keydown'].forEach(type => {
+      document.removeEventListener(type, unlockOnce, true);
+    });
+  };
+  ['pointerdown', 'touchend', 'click', 'keydown'].forEach(type => {
+    document.addEventListener(type, unlockOnce, true);
+  });
 }
 
 const SFX = {
@@ -945,6 +956,7 @@ function setupMobileControls() {
 }
 
 if (isMobile) setupMobileControls();
+installAudioUnlockHandlers();
 
 function generateMap(lvl) {
   const m = [];
