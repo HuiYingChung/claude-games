@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Audio Test</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body { background:#1a3a1a; color:#fff; font-family:sans-serif; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; margin:0; }
+button { font-size:24px; padding:20px 40px; margin:10px; border:none; border-radius:12px; cursor:pointer; background:#6ab04c; color:#fff; }
+button:active { background:#4a8a2c; }
+#log { margin-top:20px; padding:16px; background:rgba(0,0,0,0.5); border-radius:8px; max-width:600px; width:90%; font-size:14px; white-space:pre-wrap; max-height:300px; overflow-y:auto; }
+h1 { font-size:20px; }
+</style>
+</head>
+<body>
+<h1>Web Audio API Test</h1>
+<button onclick="testBeep()">Play Beep</button>
+<button onclick="testChord()">Play Chord</button>
+<button onclick="testOscillator()">Play Oscillator (raw)</button>
+<div id="log"></div>
+<script>
+const logEl = document.getElementById('log');
+function log(msg) {
+  logEl.textContent += msg + '\n';
+  logEl.scrollTop = logEl.scrollHeight;
+  console.log(msg);
+}
+
+let ctx = null;
+
+function getCtx() {
+  if (!ctx) {
+    try {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      log('AudioContext created, state: ' + ctx.state);
+      log('sampleRate: ' + ctx.sampleRate);
+    } catch(e) {
+      log('ERROR creating AudioContext: ' + e.message);
+      return null;
+    }
+  }
+  if (ctx.state === 'suspended') {
+    log('Context suspended, calling resume()...');
+    ctx.resume().then(() => {
+      log('resume() resolved! state: ' + ctx.state);
+    }).catch(e => {
+      log('resume() FAILED: ' + e.message);
+    });
+  }
+  log('Current state: ' + ctx.state + ', currentTime: ' + ctx.currentTime.toFixed(3));
+  return ctx;
+}
+
+// Test 1: Simple beep
+function testBeep() {
+  log('\n--- Test Beep ---');
+  const c = getCtx();
+  if (!c) return;
+
+  if (c.state !== 'running') {
+    log('WARNING: context not running yet! Waiting...');
+    c.resume().then(() => {
+      log('Now running! Playing beep...');
+      _playBeep(c);
+    });
+    return;
+  }
+  _playBeep(c);
+}
+
+function _playBeep(c) {
+  const osc = c.createOscillator();
+  const gain = c.createGain();
+  osc.type = 'sine';
+  osc.frequency.value = 440;
+  gain.gain.value = 0.5;
+  osc.connect(gain);
+  gain.connect(c.destination);
+  osc.start();
+  osc.stop(c.currentTime + 0.5);
+  log('Beep scheduled! freq=440Hz, gain=0.5, duration=0.5s');
+  log('Context state: ' + c.state + ', time: ' + c.currentTime.toFixed(3));
+}
+
+// Test 2: Chord (like our music)
+function testChord() {
+  log('\n--- Test Chord ---');
+  const c = getCtx();
+  if (!c) return;
+
+  if (c.state !== 'running') {
+    c.resume().then(() => _playChord(c));
+    return;
+  }
+  _playChord(c);
+}
+
+function _playChord(c) {
+  [523.25, 659.25, 783.99].forEach(freq => {
+    const osc = c.createOscillator();
+    const gain = c.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    gain.gain.value = 0.3;
+    osc.connect(gain);
+    gain.connect(c.destination);
+    osc.start();
+    osc.stop(c.currentTime + 1.0);
+  });
+  log('Chord scheduled! C5+E5+G5, gain=0.3, duration=1s');
+}
+
+// Test 3: Raw oscillator (no gain node)
+function testOscillator() {
+  log('\n--- Test Raw Oscillator ---');
+  const c = getCtx();
+  if (!c) return;
+
+  if (c.state !== 'running') {
+    c.resume().then(() => _playRaw(c));
+    return;
+  }
+  _playRaw(c);
+}
+
+function _playRaw(c) {
+  const osc = c.createOscillator();
+  osc.type = 'square';
+  osc.frequency.value = 440;
+  osc.connect(c.destination);
+  osc.start();
+  osc.stop(c.currentTime + 0.3);
+  log('Raw oscillator! square 440Hz direct to destination, 0.3s');
+}
+
+log('Page loaded. Click a button to test audio.');
+log('Browser: ' + navigator.userAgent.substring(0, 80));
+log('AudioContext available: ' + !!(window.AudioContext || window.webkitAudioContext));
+</script>
+</body>
+</html>
